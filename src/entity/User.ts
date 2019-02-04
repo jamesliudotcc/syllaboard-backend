@@ -4,7 +4,6 @@ import {
   BeforeInsert,
   ObjectIdColumn,
   ObjectID,
-  AfterInsert,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 

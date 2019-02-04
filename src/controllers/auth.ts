@@ -1,8 +1,5 @@
 import * as express from 'express';
 const jwt = require('jsonwebtoken');
-import * as validator from 'validator';
-
-const cors = require('cors');
 
 // TypeORM setup
 
@@ -18,10 +15,33 @@ const router = express.Router();
 
 // Controllers
 
-router.get('/logout', (req, res) => {
-  req.logout();
-  req.flash('success', 'You logged out. Bye!');
-  res.redirect('/');
+router.post('/login', async (req, res) => {
+  console.log('In the POST /auth/login route');
+  console.log(req.body.password);
+
+  // Find out if user is in DB
+  try {
+    const user = await userRepository.findOne({ email: req.body.email });
+    console.log(user);
+    if (!user || !user.password) {
+      return res.status(400).send('Fill in user and password');
+    }
+    const validated = await user.validPassword(req.body.password);
+    // User exists, check the password:
+    if (!validated) {
+      return res.status(401).send('Invalid credentials');
+    }
+
+    // Valid user, passed authentication. Need to make them a token
+    const token = jwt.sign({ ...user, password: '' }, process.env.JWT_SECRET, {
+      expiresIn: '1w', //24 hours in seconds
+    });
+
+    res.send({ token: token });
+  } catch (err) {
+    console.log('Error in POST /auth/login', err);
+    res.status(503).send('Database Error');
+  }
 });
 
 router.post('/signup', async (req, res) => {
