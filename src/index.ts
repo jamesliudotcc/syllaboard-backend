@@ -43,27 +43,13 @@ createConnection({
     // Expose Auth routes before all other
     // Middlewares run
 
-    app.use('/auth', require('./controllers/auth'));
-
-    // app.use(async (req, res, next) => {
-    //   try {
-    //     const user = await userRepository.findOne(req.session.passport.user);
-    //     if (!user.approved && req.path !== '/') {
-    //       req.flash('error', 'Pending approval. Nothing to see here yet.');
-    //       res.redirect('/auth/pending');
-    //     } else {
-    //       next();
-    //     }
-    //   } catch (err) {
-    //     console.log('Something went wrong with user approval middleware.');
-    //   }
-    // });
-
     /* ****************************************
     //              Routes
     ******************************************/
 
-    // app.use(express.static('static'));
+    app.use('/auth', require('./controllers/auth'));
+
+    app.use(express.static('static'));
 
     app.get('*', function(req, res, next) {
       res.status(404).send({ message: 'Not Found' });

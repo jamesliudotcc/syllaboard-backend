@@ -43,7 +43,7 @@ router.post('/signup', async (req, res) => {
     const token = jwt.sign(
       { ...savedUser, password: '' }, // Don't send hashed pw over internet
       process.env.JWT_SECRET,
-      { expiresIn: '1w' }
+      { expiresIn: '1w' },
     );
     res.send({ token: token });
   } catch (err) {
@@ -52,14 +52,4 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// router.post(
-//   '/login',
-//   //@ts-ignore
-//   passport.authenticate('local', {
-//     successRedirect: '/auth/pending',
-//     successFlash: 'Yay, login successful!',
-//     failureRedirect: '/',
-//     failureFlash: 'Invalid Credentials',
-//   })
-// );
 module.exports = router;

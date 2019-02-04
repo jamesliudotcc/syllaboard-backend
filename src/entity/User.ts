@@ -27,17 +27,7 @@ export class User {
 
   @BeforeInsert()
   hashPassword() {
-    console.log('At typeorm');
     this.password = bcrypt.hashSync(this.password, 12);
-  }
-
-  @AfterInsert()
-  toJSON() {
-    return JSON.stringify({
-      _id: this._id,
-      user: this.name,
-      email: this.email,
-    });
   }
 
   async validPassword(plainTextPassword: string) {
