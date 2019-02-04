@@ -33,6 +33,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Valid user, passed authentication. Need to make them a token
+
     const token = jwt.sign({ ...user, password: '' }, process.env.JWT_SECRET, {
       expiresIn: '1w', //24 hours in seconds
     });
@@ -47,9 +48,11 @@ router.post('/login', async (req, res) => {
 router.post('/signup', async (req, res) => {
   //TODO debug statements; remove when no longer needed
   console.log('In the POST /auth/signup route');
+  console.log(req.body);
 
   try {
     const user = await userRepository.findOne({ email: req.body.email });
+    console.log(user);
 
     if (user) {
       // If user exists, don't let them create a duplicate
@@ -60,6 +63,8 @@ router.post('/signup', async (req, res) => {
     const createdUser = await userRepository.create(req.body);
     const savedUser = await manager.save(createdUser);
 
+    console.log('Saved User:', savedUser);
+
     const token = jwt.sign(
       { ...savedUser, password: '' }, // Don't send hashed pw over internet
       process.env.JWT_SECRET,
@@ -69,6 +74,22 @@ router.post('/signup', async (req, res) => {
   } catch (err) {
     console.log('Error in POST /auth/signup', err);
     res.status(503).send('Database Error');
+  }
+});
+
+router.post('/current/user', async (req, res) => {
+  console.log('GET /auth/current/user STUB');
+
+  if (!req.user) {
+    return res.status(401).send({ user: null });
+  }
+
+  try {
+    const user = await userRepository.findOne({ email: req.user.email });
+    res.send({ user: user });
+  } catch (err) {
+    console.log('Error with /auth/current GET route:', err);
+    res.status(503).send({ user: null });
   }
 });
 

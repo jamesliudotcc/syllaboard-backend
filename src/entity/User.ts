@@ -13,7 +13,10 @@ export class User {
   _id: ObjectID;
 
   @Column()
-  name: string = '';
+  firstName: string = '';
+  
+  @Column()
+  lastName: string = '';
 
   @Column()
   email: string = '';

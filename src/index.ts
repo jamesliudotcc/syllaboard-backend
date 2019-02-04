@@ -1,6 +1,7 @@
 // Express required Imports
 const cors = require('cors');
 import * as express from 'express';
+import * as expressJwt from 'express-jwt';
 require('dotenv').config();
 
 // DB requried imports
@@ -47,6 +48,7 @@ createConnection({
         req.body.headers.Authorization &&
         req.body.headers.Authorization.split(' ')[0] === 'Bearer'
       ) {
+        console.log(req.body.headers.Authorization);
         return req.body.headers.Authorization.split(' ')[1];
       }
       return null;
