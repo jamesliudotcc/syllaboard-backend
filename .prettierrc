@@ -1,0 +1,41 @@
+{
+  "printWidth": 80,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": "src/**/*.ts",
+      "options": {
+        "parser": "typescript"
+      }
+    },
+    {
+      "files": "./**/*.js",
+      "options": {
+        "parser": "babel",
+        "singleQuote": false
+      }
+    },
+    {
+      "files": "src/**/*.{scss,css}",
+      "options": {
+        "singleQuote": false,
+        "semi": true
+      }
+    },
+    {
+      "files": "./**/*.json",
+      "options": {
+        "parser": "json"
+      }
+    },
+    {
+      "files": ".prettierrc",
+      "options": {
+        "parser": "json"
+      }
+    }
+  ]
+}
