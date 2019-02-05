@@ -50,7 +50,8 @@ const jwtLogin = new JwtStrategy(jwtOptions, async (payload, done) => {
   // If it does, call 'done' with that 
   // otherwise, call done without a user object
   try {
-    const user = await userRepository.findOne(payload._id);
+    const user = await userRepository.findOne(payload.id);
+    console.log(user);
 
     if (!user) {
       return done(null, false);
