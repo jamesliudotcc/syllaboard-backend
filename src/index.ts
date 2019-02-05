@@ -9,7 +9,10 @@ config();
 // DB required imports
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
+import { Assignment } from './entity/Assignment';
 import { Cohort } from './entity/Cohort';
+import { Deliverable } from './entity/Deliverable';
+import { Topic } from './entity/Topic';
 import { User } from './entity/User';
 
 // End of upload required packages
@@ -19,7 +22,7 @@ createConnection({
   host: process.env.MONGO_URL,
   port: Number(process.env.MONGO_PORT),
   database: 'test3',
-  entities: [User, Cohort],
+  entities: [Assignment, Cohort, Deliverable, Topic, User],
   useNewUrlParser: true,
   synchronize: true,
   logging: false,
@@ -48,6 +51,7 @@ createConnection({
     ******************************************/
 
     app.use('/auth', require('./controllers/auth'));
+    app.use('/cohort', require('./controllers/cohort'));
 
     app.get('*', (req, res, next) => {
       res.status(404).send({ message: 'Not Found' });

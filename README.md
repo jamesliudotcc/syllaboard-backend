@@ -1,7 +1,8 @@
 # Syllaboard Backend
 
 ## Things to add
-Create a .env file in your src entity that has MONGO_PORT with your database URI and a JWT_SECRET with some sweet secret.
+
+Turn the .env.example into a .env. The random looking strings are random nonsense we pulled from a [random string generator service](https://www.grc.com/passwords.htm). They are different from what we are using for the project. .env.example is an example. You should generate similarly long random strings!
 
 ## Schemas
 
