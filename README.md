@@ -1,5 +1,8 @@
 # Syllaboard Backend
 
+## Things to add
+Create a .env file in your src entity that has MONGO_PORT with your database URI and a JWT_SECRET with some sweet secret.
+
 ## Schemas
 
 | Assignment    | type     |

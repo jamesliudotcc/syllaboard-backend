@@ -5,7 +5,7 @@ import { Cohort } from './Cohort';
 
 createConnection({
   type: 'mongodb',
-  host: 'localhost',
+  host: process.env.MONGO_URL,
   port: Number(process.env.MONGO_PORT),
   database: 'test3',
   entities: [User, Assignment, Cohort],

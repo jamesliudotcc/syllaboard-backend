@@ -11,7 +11,10 @@ import {
 export class Assignment {
     @ObjectIdColumn()
     _id: ObjectID;
-
+    
+    @Column()
+    name: string; // Refs user
+    
     @Column()
     student: string; // Refs user
 
