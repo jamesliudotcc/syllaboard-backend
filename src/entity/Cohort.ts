@@ -17,25 +17,25 @@ export class Cohort {
   _id: ObjectID;
 
   @Column()
-  key: string
+  key: string;
 
   @Column()
-  name: string
+  name: string;
 
   @Column()
-  campus: string
+  campus: string;
 
   @Column()
-  students: ObjectID[] // User
+  students: ObjectID[]; // User
 
   @Column()
-  instructors: ObjectID[] // User
+  instructors: ObjectID[]; // User
 
   @Column()
-  startDate: Date
+  startDate: Date;
 
   @Column()
-  endDate: Date
+  endDate: Date;
 
   @BeforeInsert()
   generateKey() {
