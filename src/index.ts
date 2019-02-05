@@ -1,16 +1,15 @@
 // Express required Imports
-const cors = require('cors');
+import cors = require('cors');
+import { config } from 'dotenv';
 import * as express from 'express';
-import * as expressJwt from 'express-jwt';
-require('dotenv').config();
+import logger = require('morgan');
 
-// DB requried imports
+config();
+
+// DB required imports
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import { User } from './entity/User';
-// Import my middlewares
-
-const isUserAuthenticated = require('./middleware/isUserAuthenticated');
 
 // End of upload required packages
 
@@ -28,58 +27,33 @@ createConnection({
     const userRepository = connection.getRepository(User);
 
     /* ****************************************
-    //              Initialize App
+    //*              Initialize App
     ******************************************/
 
     const app = express();
 
     /* ****************************************
-    //              Middlewares
+    //*             Middlewares
     ******************************************/
 
+    app.use(logger('dev'));
     app.use(cors());
     app.use(express.json({ limit: '50mb' }));
     app.use(express.urlencoded({ extended: false }));
 
-    // Helper function: This allows our server to parse the incoming token from the client
-    // This is being run as middleware, so it has access to the incoming request
-    function fromRequest(req) {
-      if (
-        req.body.headers.Authorization &&
-        req.body.headers.Authorization.split(' ')[0] === 'Bearer'
-      ) {
-        console.log(req.body.headers.Authorization);
-        return req.body.headers.Authorization.split(' ')[1];
-      }
-      return null;
-    }
 
     /* ****************************************
-    //              Routes
+    //*             Routes
     ******************************************/
 
-    app.use(
-      '/auth',
-      expressJwt({
-        secret: process.env.JWT_SECRET,
-        getToken: fromRequest,
-      }).unless({
-        path: [
-          { url: '/auth/login', methods: ['POST'] },
-          { url: '/auth/signup', methods: ['POST'] },
-        ],
-      }),
-      require('./controllers/auth'),
-    );
+    app.use('/auth', require('./controllers/auth'));
 
-    app.use(express.static('static'));
-
-    app.get('*', function(req, res, next) {
+    app.get('*', (req, res, next) => {
       res.status(404).send({ message: 'Not Found' });
     });
 
     /* ****************************************
-    //              Listen
+    //*              Listen
     ******************************************/
     const listenPort = process.env.PORT || 3000;
     app.listen(listenPort, () => {
