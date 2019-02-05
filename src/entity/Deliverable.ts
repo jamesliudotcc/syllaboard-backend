@@ -4,6 +4,7 @@ import { Topic } from './Topic';
 @Entity()
 export class Deliverable {
   @ObjectIdColumn()
+  // tslint:disable-next-line
   _id: ObjectID;
 
   @Column()

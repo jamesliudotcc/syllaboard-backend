@@ -14,6 +14,7 @@ const nanoid = require('nanoid-good')(en);
 @Entity()
 export class Cohort {
   @ObjectIdColumn()
+  // tslint:disable-next-line
   _id: ObjectID;
 
   @Column()
