@@ -22,7 +22,7 @@ createConnection({
     const Cohort1: Cohort = new Cohort();
     Cohort1.name = 'WDI Test';
     Cohort1.campus = 'Seattle';
-    Cohort1.startDate = new Date('2019-11-26');
+    Cohort1.startDate = new Date('2018-11-26');
     Cohort1.endDate = new Date('2019-03-01');
 
     const Assignment1 = {
