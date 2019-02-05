@@ -3,6 +3,7 @@ import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 @Entity()
 export class Cohort {
   @ObjectIdColumn()
+  // tslint:disable-next-line
   _id: ObjectID;
 
   @Column()
