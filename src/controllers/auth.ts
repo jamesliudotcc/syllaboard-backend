@@ -85,7 +85,8 @@ router.post('/signup', async (req, res) => {
     console.log('Saved User:', savedUser);
 
     // Add student id to cohort
-    cohort.students.push(savedUser._id);
+    const newStudent = await userRepository.findOne({ email: savedUser.email });
+    cohort.students.push(newStudent._id);
     await cohortRepository.save(cohort);
 
     const token = createToken(savedUser);

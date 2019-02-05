@@ -8,7 +8,7 @@ createConnection({
   host: process.env.MONGO_URL,
   port: Number(process.env.MONGO_PORT),
   database: 'test3',
-  entities: [User, Cohort],
+  entities: [User, Cohort, Deliverable],
   useNewUrlParser: true,
   synchronize: true,
   logging: false,
@@ -24,6 +24,10 @@ createConnection({
     Cohort1.campus = 'Seattle';
     Cohort1.startDate = new Date('2019-11-26');
     Cohort1.endDate = new Date('2019-03-01');
+    Cohort1.students = [];
+
+    const savedCohort = await manager.save(Cohort1);
+    console.log(savedCohort);
 
     const Assignment1 = {
       student: '5c58aa8dc4990b39dd2eefb9',
