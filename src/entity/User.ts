@@ -10,6 +10,7 @@ import {
 @Entity()
 export class User {
   @ObjectIdColumn()
+  // tslint:disable-next-line
   _id: ObjectID;
 
   @Column()
