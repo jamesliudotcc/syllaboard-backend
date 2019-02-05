@@ -4,9 +4,11 @@ import jwt = require('jsonwebtoken');
 
 // TypeORM setup
 import { getManager, getRepository } from 'typeorm';
+import { Cohort } from '../entity/Cohort';
 import { User } from '../entity/User';
 
 const userRepository = getRepository(User);
+const cohortRepository = getRepository(Cohort);
 const manager = getManager();
 
 // Express setup
@@ -44,6 +46,7 @@ router.post('/signin', requireSignIn, (req, res) => {
 // TODO: Remove this route after done testing
 /* GET /auth/test - Require JWT, Return message */
 router.get('/test', requireAuth, (req, res) => {
+  console.log('In /auth/test');
   return res.send({ message: 'Hello There!' });
 });
 
@@ -53,20 +56,38 @@ router.post('/signup', async (req, res) => {
   console.log('In the POST /auth/signup route');
   console.log(req.body);
 
-  try {
-    const user = await userRepository.findOne({ email: req.body.email });
-    console.log(user);
+  const newUserData = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    password: req.body.password,
+  };
 
+  try {
+    // Check if cohort 'Key' is valid
+    const cohort = await cohortRepository.findOne({ key: req.body.cohortKey });
+    if (!cohort) {
+      return res.status(409).send('No cohort found');
+    }
+
+    const user = await userRepository.findOne({ email: newUserData.email });
+    console.log('Existing User:', user);
+
+    // If user exists, don't let them create a duplicate
     if (user) {
-      // If user exists, don't let them create a duplicate
       return res.status(409).send('User already exists');
     }
 
     // TODO: Add some validations
-    const createdUser = await userRepository.create(req.body);
+    const createdUser = await userRepository.create(newUserData);
     const savedUser = await manager.save(createdUser);
 
     console.log('Saved User:', savedUser);
+
+    // Add student id to cohort
+    const newStudent = await userRepository.findOne({ email: savedUser.email });
+    cohort.students.push(newStudent._id);
+    await cohortRepository.save(cohort);
 
     const token = createToken(savedUser);
     return res.send({ token });
