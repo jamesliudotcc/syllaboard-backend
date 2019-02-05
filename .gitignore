@@ -7,3 +7,4 @@ temp/
 .env
 uploads/
 .mlab-creds
+package-lock.json
