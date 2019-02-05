@@ -6,7 +6,6 @@ import {
     ObjectID,
   } from 'typeorm';
 
-{user: {_id: ObjectID, name: string, email: string, password: string}} // Import from User entity
 
 @Entity()
 export class Assignment {
@@ -40,28 +39,3 @@ export class Assignment {
     @Column()
     grade: Number | null; // 1-3 usually around 2.1-2.6
 }
-
-@Entity()
-export class Cohort {
-    @ObjectIdColumn()
-    _id: ObjectID;
-
-    @Column()
-    name: string
-
-    @Column()
-    campus: string
-
-    @Column()
-    students: ObjectID[] //user
-
-    @Column()
-    instructors: ObjectID[] // User
-
-    @Column()
-    startDate: Date
-
-    @Column()
-    endDate: Date
-}
-
