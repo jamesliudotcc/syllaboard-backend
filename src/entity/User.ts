@@ -14,7 +14,7 @@ export class User {
 
   @Column()
   firstName: string = '';
-  
+
   @Column()
   lastName: string = '';
 

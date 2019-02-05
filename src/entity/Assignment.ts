@@ -1,44 +1,32 @@
-import {
-    Entity,
-    Column,
-    BeforeInsert,
-    ObjectIdColumn,
-    ObjectID,
-  } from 'typeorm';
-
+import { Entity, Column, ObjectIdColumn, ObjectID } from 'typeorm';
+import { Topic } from './Topic';
 
 @Entity()
 export class Assignment {
-    @ObjectIdColumn()
-    _id: ObjectID;
-    
-    @Column()
-    name: string; // Refs user
-    
-    @Column()
-    student: string; // Refs user
+  @ObjectIdColumn()
+  _id: ObjectID;
 
-    @Column()
-    instructor: string;
+  @Column()
+  name: string;
 
-    @Column()
-    instructions: string; // this is the instructor’s notes on what should be accomplished.
+  @Column()
+  version: number;
 
-    @Column()
-    resourcesUrls: string[]; // optional
+  @Column()
+  cohortType: string; // Refs cohort
 
-    @Column()
-    deadline: Date;
+  @Column()
+  cohortWeek: string; // When should this be assigned
 
-    @Column()
-    turnedIn: Date | null; // Maybe just a Boolean?
-    
-    @Column() // null indicates not turned in.
-    completed: Date | null; // Date indicates acceptance of assignment
+  @Column()
+  instructor: string; // Who does this belong to? Instructor can filter for own and other instructors' materials
 
-    @Column()
-    deliverable: string | null; // URL to deliverable, Google Doc, or whatever.
+  @Column()
+  instructions: string; // this is the instructor’s notes on what should be accomplished.
 
-    @Column()
-    grade: Number | null; // 1-3 usually around 2.1-2.6
+  @Column()
+  resourcesUrls: string[]; // optional
+
+  @Column(type => Topic)
+  topics: Topic[];
 }

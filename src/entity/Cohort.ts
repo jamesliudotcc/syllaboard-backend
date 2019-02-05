@@ -1,31 +1,25 @@
-import {
-  Entity,
-  Column,
-  BeforeInsert,
-  ObjectIdColumn,
-  ObjectID,
-} from 'typeorm';
+import { Entity, Column, ObjectIdColumn, ObjectID } from 'typeorm';
 
 @Entity()
 export class Cohort {
-    @ObjectIdColumn()
-    _id: ObjectID;
+  @ObjectIdColumn()
+  _id: ObjectID;
 
-    @Column()
-    name: string
+  @Column()
+  name: string;
 
-    @Column()
-    campus: string
+  @Column()
+  campus: string;
 
-    @Column()
-    students: ObjectID[] //user
+  @Column()
+  students: ObjectID[]; //user
 
-    @Column()
-    instructors: ObjectID[] // User
+  @Column()
+  instructors: ObjectID[]; // User
 
-    @Column()
-    startDate: Date
+  @Column()
+  startDate: Date;
 
-    @Column()
-    endDate: Date
+  @Column()
+  endDate: Date;
 }

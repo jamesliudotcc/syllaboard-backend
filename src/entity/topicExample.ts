@@ -1,9 +1,4 @@
-import {
-  getRepository,
-  getManager,
-  getMongoManager,
-  createConnection,
-} from 'typeorm';
+import { getRepository, getMongoManager, createConnection } from 'typeorm';
 import { User } from './User';
 import { Deliverable } from './Deliverable';
 import { Cohort } from './Cohort';
