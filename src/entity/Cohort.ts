@@ -1,4 +1,4 @@
-import { Entity, Column, ObjectIdColumn, ObjectID } from 'typeorm';
+import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 
 @Entity()
 export class Cohort {
@@ -12,7 +12,7 @@ export class Cohort {
   campus: string;
 
   @Column()
-  students: ObjectID[]; //user
+  students: ObjectID[]; // user
 
   @Column()
   instructors: ObjectID[]; // User

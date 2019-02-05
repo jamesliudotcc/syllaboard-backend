@@ -1,4 +1,4 @@
-import { Entity, Column, ObjectIdColumn, ObjectID } from 'typeorm';
+import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 import { Topic } from './Topic';
 
 @Entity()
@@ -37,5 +37,5 @@ export class Deliverable {
   deliverable: string | null; // URL to deliverable, Google Doc, or whatever.
 
   @Column()
-  grade: Number | null; // 1-3 usually around 2.1-2.6
+  grade: number | null; // 1-3 usually around 2.1-2.6
 }

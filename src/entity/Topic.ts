@@ -1,4 +1,4 @@
-import { Entity, Column, ObjectIdColumn, ObjectID } from 'typeorm';
+import { Column } from 'typeorm';
 
 export class Topic {
   @Column()
@@ -8,5 +8,5 @@ export class Topic {
   numOfAnswers: number;
 
   @Column()
-  answers: string[]; //user
+  answers: string[]; // user
 }

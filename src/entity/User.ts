@@ -1,11 +1,11 @@
-import {
-  Entity,
-  Column,
-  BeforeInsert,
-  ObjectIdColumn,
-  ObjectID,
-} from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  ObjectID,
+  ObjectIdColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
