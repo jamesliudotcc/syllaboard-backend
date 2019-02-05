@@ -9,6 +9,7 @@ config();
 // DB required imports
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
+import { Cohort } from './entity/Cohort';
 import { User } from './entity/User';
 
 // End of upload required packages
@@ -18,7 +19,7 @@ createConnection({
   host: process.env.MONGO_URL,
   port: Number(process.env.MONGO_PORT),
   database: 'test3',
-  entities: [User],
+  entities: [User, Cohort],
   useNewUrlParser: true,
   synchronize: true,
   logging: false,
