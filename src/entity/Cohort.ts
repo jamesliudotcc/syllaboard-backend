@@ -27,10 +27,10 @@ export class Cohort {
   campus: string;
 
   @Column()
-  students: ObjectID[]; // User
+  students: ObjectID[] = []; // User
 
   @Column()
-  instructors: ObjectID[]; // User
+  instructors: ObjectID[] = []; // User
 
   @Column()
   startDate: Date;

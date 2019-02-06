@@ -1,6 +1,7 @@
 import {
   createConnection,
   getMongoManager,
+  getMongoRepository,
   getRepository,
   MongoEntityManager,
 } from 'typeorm';
@@ -27,6 +28,33 @@ createConnection({
     // await createCohorts(manager);
 
     // Populate Cohorts with students
+    const userRepository = getMongoRepository(User);
+    const cohortRepository = getMongoRepository(Cohort);
+
+    const WDI22 = await cohortRepository.findOne({ where: { name: 'WDI22' } });
+    console.log(WDI22.name, WDI22._id, WDI22.students);
+    const UXDI22 = await cohortRepository.findOne({
+      where: { name: 'UXDI22' },
+    });
+    console.log(UXDI22.name, UXDI22._id);
+    const someUsers = await userRepository.find({ take: 10 });
+    const nextUsers = await userRepository.find({ skip: 10 });
+
+    // someUsers
+    //   .filter(user => user.role === 'student')
+    //   .forEach(async user => {
+    //     console.log(user._id);
+    //     const a = WDI22.students.push(user._id);
+    //     console.log(a);
+    //     manager.save(WDI22);
+    //   });
+    nextUsers
+      .filter(user => user.role === 'student')
+      .forEach(user => {
+        UXDI22.students.push(user._id);
+        console.log(user.firstName, user.lastName, user.role, 'to UXDI22');
+        manager.save(UXDI22);
+      });
   } catch (error) {
     console.log('Something went wrong', error);
   }
@@ -39,6 +67,8 @@ async function createCohorts(manager: MongoEntityManager) {
   cohort1.campus = 'Seattle';
   cohort1.startDate = new Date('2018-11-26');
   cohort1.endDate = new Date('2019-03-01');
+  // cohort1.students = [];
+  // cohort1.instructors = [];
 
   const cohort2: Cohort = new Cohort();
   cohort2.name = 'UXDI22';
