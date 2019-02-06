@@ -34,17 +34,32 @@ createConnection({
     //   userRepository,
     // );
 
-    // Student hands in deliverable with URL:
-    // Student pulls a particular deliverable from the list of deliverables
+    // // Student hands in deliverable with URL:
+    // // Student pulls a particular deliverable from the list of deliverables
 
-    const cindieB = await userRepository.findOne('5c5a0fd8b5892d3b41aeed83');
-    console.log(cindieB.deliverables[0].instructions);
+    // const cindieB = await userRepository.findOne('5c5a0fd8b5892d3b41aeed83');
+    // console.log(cindieB.deliverables[0].instructions);
 
-    // It gets marked done.
+    // // It gets marked turned in.
 
-    cindieB.deliverables[0].turnedIn = new Date();
+    // cindieB.deliverables[0].turnedIn = new Date();
+    // // 1st CindieB tells what to update, 2nd updates it with CindieB as updated
+    // await userRepository.update(cindieB, cindieB);
 
-    // Instructor can find all completed deliverables
+    // // Instructor can find all turned in deliverables
+
+    const users = await userRepository.find();
+    const students = users
+      .filter(s => s.role === 'student')
+      .filter(s => s.deliverables.length >= 1)
+      .map(s => ({ student: s._id, deliverables: s.deliverables }));
+    console.log(students);
+
+    // const turnedIn = students.filter(student =>
+    //   student.deliverables.filter(deliverable => deliverable.turnedIn !== null),
+    // );
+
+    // console.log(turnedIn.forEach(e => e.deliverables[0].turnedIn));
 
     // Intructor can mark as completed and with a grad.
   } catch (error) {

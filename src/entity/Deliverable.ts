@@ -25,10 +25,10 @@ export class Deliverable {
   deadline: Date;
 
   @Column()
-  turnedIn: Date | null; // Maybe just a Boolean?
+  turnedIn: Date | null = null; // Maybe just a Boolean?
 
   @Column() // null indicates not turned in.
-  completed: Date | null; // Date indicates acceptance of assignment
+  completed: Date | null = null; // Date indicates acceptance of assignment
 
   @Column()
   deliverable: string | null; // URL to deliverable, Google Doc, or whatever.
