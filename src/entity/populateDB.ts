@@ -39,7 +39,9 @@ createConnection({
     cohort2.startDate = new Date('2018-11-26');
     cohort2.endDate = new Date('2019-03-01');
 
-    await cohortRepository.create();
+    const createdCohort = await cohortRepository.create(cohort1);
+    const savedCohort = await manager.save(createdCohort);
+    console.log(savedCohort);
 
     // Populate Cohorts with students
   } catch (error) {
