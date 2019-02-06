@@ -2,8 +2,8 @@ import { createConnection, getMongoManager, getRepository } from 'typeorm';
 
 import { Assignment } from './Assignment';
 import { Cohort } from './Cohort';
-import { User } from './User';
 import { Deliverable } from './Deliverable';
+import { User } from './User';
 // import { Topic } from './Topic';
 
 createConnection({
@@ -28,39 +28,58 @@ createConnection({
 
     // Assignment to each member of cohort
 
-    // Pull out a cohort
+    // await assignmentToDeliverables(
+    //   assignmentRepository,
+    //   cohortRepository,
+    //   userRepository,
+    // );
 
-    const thisAssignment = await assignmentRepository.findOne();
-    console.log(thisAssignment);
+    // Student hands in deliverable with URL:
+    // Student pulls a particular deliverable from the list of deliverables
 
-    const thisCohort = await cohortRepository.findOne({
-      where: { name: 'WDI22' },
-    });
+    const cindieB = await userRepository.findOne('5c5a0fd8b5892d3b41aeed83');
+    console.log(cindieB.deliverables[0].instructions);
 
-    thisCohort.students.forEach(async student => {
-      // For each id in cohort, pull a student
-      const thisStudent = await userRepository.findOne({ _id: student });
-      console.log(thisStudent.firstName);
+    // It gets marked done.
 
-      // Create a new Deliverable, copying assignment into new deliverable
-      const studentDeliverable = new Deliverable();
+    cindieB.deliverables[0].turnedIn = new Date();
 
-      studentDeliverable.name = thisAssignment.name;
-      studentDeliverable.instructions = thisAssignment.instructions;
-      studentDeliverable.instructor = thisAssignment.instructor;
-      studentDeliverable.resourcesUrls = thisAssignment.resourcesUrls;
-      studentDeliverable.topics = thisAssignment.topics;
-      studentDeliverable.deadline = new Date('2019-02-11');
+    // Instructor can find all completed deliverables
 
-      // Push deliverable
-      thisStudent.deliverables.push(studentDeliverable);
-
-      await userRepository.update(thisStudent, thisStudent);
-    });
+    // Intructor can mark as completed and with a grad.
   } catch (error) {
     console.log('Something went wrong', error);
   }
 });
+
+async function assignmentToDeliverables(
+  assignmentRepository,
+  cohortRepository,
+  userRepository,
+) {
+  const thisAssignment = await assignmentRepository.findOne();
+  console.log(thisAssignment);
+  // Pull out a cohort
+  const thisCohort = await cohortRepository.findOne({
+    where: { name: 'WDI22' },
+  });
+  thisCohort.students.forEach(async student => {
+    // For each id in cohort, pull a student
+    const thisStudent = await userRepository.findOne({ _id: student });
+    console.log(thisStudent.firstName);
+    // Create a new Deliverable, copying assignment into new deliverable
+    const studentDeliverable = new Deliverable();
+    studentDeliverable.name = thisAssignment.name;
+    studentDeliverable.instructions = thisAssignment.instructions;
+    studentDeliverable.instructor = thisAssignment.instructor;
+    studentDeliverable.resourcesUrls = thisAssignment.resourcesUrls;
+    studentDeliverable.topics = thisAssignment.topics;
+    studentDeliverable.deadline = new Date('2019-02-11');
+    // Push deliverable
+    thisStudent.deliverables.push(studentDeliverable);
+    await userRepository.update(thisStudent, thisStudent);
+  });
+}
 
 async function createAssignment(userRepository, assignmentRepository, manager) {
   const someIntructor = await userRepository.findOne({
