@@ -1,7 +1,6 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 import { Topic } from './Topic';
 
-@Entity()
 export class Deliverable {
   @ObjectIdColumn()
   // tslint:disable-next-line
@@ -9,9 +8,6 @@ export class Deliverable {
 
   @Column()
   name: string;
-
-  @Column()
-  student: string; // Refs user
 
   @Column()
   instructor: string;

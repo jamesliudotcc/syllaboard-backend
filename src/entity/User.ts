@@ -6,6 +6,7 @@ import {
   ObjectID,
   ObjectIdColumn,
 } from 'typeorm';
+import { Deliverable } from './Deliverable';
 
 @Entity()
 export class User {
@@ -27,6 +28,9 @@ export class User {
 
   @Column('enum')
   role: 'admin' | 'instructor' | 'student';
+
+  @Column(type => Deliverable)
+  deliverables: Deliverable;
 
   @BeforeInsert()
   hashPassword() {
