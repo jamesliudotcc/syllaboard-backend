@@ -23,42 +23,43 @@ createConnection({
 }).then(async connection => {
   try {
     const manager = getMongoManager();
+
     // Uncomment and run for mock data
+
     // createUsers(manager);
     // await createCohorts(manager);
-
-    // Populate Cohorts with students
-    const userRepository = getMongoRepository(User);
-    const cohortRepository = getMongoRepository(Cohort);
-
-    const WDI22 = await cohortRepository.findOne({ where: { name: 'WDI22' } });
-    console.log(WDI22.name, WDI22._id, WDI22.students);
-    const UXDI22 = await cohortRepository.findOne({
-      where: { name: 'UXDI22' },
-    });
-    console.log(UXDI22.name, UXDI22._id);
-    const someUsers = await userRepository.find({ take: 10 });
-    const nextUsers = await userRepository.find({ skip: 10 });
-
-    // someUsers
-    //   .filter(user => user.role === 'student')
-    //   .forEach(async user => {
-    //     console.log(user._id);
-    //     const a = WDI22.students.push(user._id);
-    //     console.log(a);
-    //     manager.save(WDI22);
-    //   });
-    nextUsers
-      .filter(user => user.role === 'student')
-      .forEach(user => {
-        UXDI22.students.push(user._id);
-        console.log(user.firstName, user.lastName, user.role, 'to UXDI22');
-        manager.save(UXDI22);
-      });
+    // await populateCohorts(manager);
   } catch (error) {
     console.log('Something went wrong', error);
   }
 });
+
+async function populateCohorts(manager: MongoEntityManager) {
+  const userRepository = getMongoRepository(User);
+  const cohortRepository = getMongoRepository(Cohort);
+  const WDI22 = await cohortRepository.findOne({ where: { name: 'WDI22' } });
+  console.log(WDI22.name, WDI22._id, WDI22.students);
+  const UXDI22 = await cohortRepository.findOne({
+    where: { name: 'UXDI22' },
+  });
+  console.log(UXDI22.name, UXDI22._id);
+  const someUsers = await userRepository.find({ take: 10 });
+  const nextUsers = await userRepository.find({ skip: 10 });
+  someUsers
+    .filter(user => user.role === 'student')
+    .forEach(async user => {
+      const a = WDI22.students.push(user._id);
+      console.log(user.firstName, user.lastName, user.role, 'to WDI22');
+      manager.save(WDI22);
+    });
+  nextUsers
+    .filter(user => user.role === 'student')
+    .forEach(user => {
+      UXDI22.students.push(user._id);
+      console.log(user.firstName, user.lastName, user.role, 'to UXDI22');
+      manager.save(UXDI22);
+    });
+}
 
 async function createCohorts(manager: MongoEntityManager) {
   const cohortRepository = getRepository(Cohort);
