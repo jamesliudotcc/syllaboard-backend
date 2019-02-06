@@ -10,7 +10,7 @@ export class Deliverable {
   name: string;
 
   @Column()
-  instructor: string;
+  instructor: ObjectID[] = [];
 
   @Column()
   instructions: string; // this is the instructor’s notes on what should be accomplished.
@@ -19,7 +19,7 @@ export class Deliverable {
   resourcesUrls: string[]; // optional
 
   @Column(type => Topic)
-  topics: Topic[];
+  topics: Topic[] = [];
 
   @Column()
   deadline: Date;

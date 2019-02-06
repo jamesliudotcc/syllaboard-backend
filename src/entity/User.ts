@@ -30,7 +30,7 @@ export class User {
   role: 'admin' | 'instructor' | 'student';
 
   @Column(type => Deliverable)
-  deliverables: Deliverable;
+  deliverables: Deliverable[] = [];
 
   @BeforeInsert()
   hashPassword() {

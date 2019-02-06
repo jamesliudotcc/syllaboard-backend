@@ -29,5 +29,5 @@ export class Assignment {
   resourcesUrls: string[]; // optional
 
   @Column(type => Topic)
-  topics: Topic[];
+  topics: Topic[] = [];
 }

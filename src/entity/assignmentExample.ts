@@ -3,6 +3,7 @@ import { createConnection, getMongoManager, getRepository } from 'typeorm';
 import { Assignment } from './Assignment';
 import { Cohort } from './Cohort';
 import { User } from './User';
+import { Deliverable } from './Deliverable';
 // import { Topic } from './Topic';
 
 createConnection({
@@ -29,14 +30,33 @@ createConnection({
 
     // Pull out a cohort
 
+    const thisAssignment = await assignmentRepository.findOne();
+    console.log(thisAssignment);
+
     const thisCohort = await cohortRepository.findOne({
       where: { name: 'WDI22' },
     });
-    console.log(thisCohort.students);
-    // For each id in cohort, pull a student
-    // Create a new Deliverable, copying assignment into new deliverable
 
-    // Push deliverable
+    thisCohort.students.forEach(async student => {
+      // For each id in cohort, pull a student
+      const thisStudent = await userRepository.findOne({ _id: student });
+      console.log(thisStudent.firstName);
+
+      // Create a new Deliverable, copying assignment into new deliverable
+      const studentDeliverable = new Deliverable();
+
+      studentDeliverable.name = thisAssignment.name;
+      studentDeliverable.instructions = thisAssignment.instructions;
+      studentDeliverable.instructor = thisAssignment.instructor;
+      studentDeliverable.resourcesUrls = thisAssignment.resourcesUrls;
+      studentDeliverable.topics = thisAssignment.topics;
+      studentDeliverable.deadline = new Date('2019-02-11');
+
+      // Push deliverable
+      thisStudent.deliverables.push(studentDeliverable);
+
+      await userRepository.update(thisStudent, thisStudent);
+    });
   } catch (error) {
     console.log('Something went wrong', error);
   }
@@ -47,6 +67,7 @@ async function createAssignment(userRepository, assignmentRepository, manager) {
     where: { role: 'instructor' },
   });
   const assignment1: Assignment = new Assignment();
+  assignment1.name = 'Resume';
   assignment1.instructor.push(someIntructor._id);
   assignment1.version = 1;
   assignment1.cohortType = ['WDI', 'UXDI', 'DSI'];
