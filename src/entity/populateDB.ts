@@ -22,32 +22,38 @@ createConnection({
 }).then(async connection => {
   try {
     const manager = getMongoManager();
+    // Uncomment and run for mock data
     // createUsers(manager);
-
-    // Create Cohorts
-    const cohortRepository = getRepository(Cohort);
-
-    const cohort1: Cohort = new Cohort();
-    cohort1.name = 'WDI22';
-    cohort1.campus = 'Seattle';
-    cohort1.startDate = new Date('2018-11-26');
-    cohort1.endDate = new Date('2019-03-01');
-
-    const cohort2: Cohort = new Cohort();
-    cohort2.name = 'WDI22';
-    cohort2.campus = 'Seattle';
-    cohort2.startDate = new Date('2018-11-26');
-    cohort2.endDate = new Date('2019-03-01');
-
-    const createdCohort = await cohortRepository.create(cohort1);
-    const savedCohort = await manager.save(createdCohort);
-    console.log(savedCohort);
+    // await createCohorts(manager);
 
     // Populate Cohorts with students
   } catch (error) {
     console.log('Something went wrong', error);
   }
 });
+
+async function createCohorts(manager: MongoEntityManager) {
+  const cohortRepository = getRepository(Cohort);
+  const cohort1: Cohort = new Cohort();
+  cohort1.name = 'WDI22';
+  cohort1.campus = 'Seattle';
+  cohort1.startDate = new Date('2018-11-26');
+  cohort1.endDate = new Date('2019-03-01');
+
+  const cohort2: Cohort = new Cohort();
+  cohort2.name = 'UXDI22';
+  cohort2.campus = 'Seattle';
+  cohort2.startDate = new Date('2018-11-26');
+  cohort2.endDate = new Date('2019-03-01');
+
+  const createdCohort1 = await cohortRepository.create(cohort1);
+  const savedCohort1 = await manager.save(createdCohort1);
+  console.log(savedCohort1);
+
+  const createdCohort2 = await cohortRepository.create(cohort2);
+  const savedCohort2 = await manager.save(createdCohort2);
+  console.log(savedCohort2);
+}
 
 function createUsers(manager: MongoEntityManager) {
   // Most of this function is the mock data
