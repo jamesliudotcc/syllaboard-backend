@@ -29,8 +29,8 @@ export class User {
   @Column('enum')
   role: 'admin' | 'instructor' | 'student';
 
-  @Column(type => Deliverable)
-  deliverables: Deliverable[] = [];
+  @Column()
+  deliverables: ObjectID[] = [];
 
   @BeforeInsert()
   hashPassword() {

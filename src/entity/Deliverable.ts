@@ -1,17 +1,20 @@
 import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
 import { Topic } from './Topic';
 
+@Entity()
 export class Deliverable {
   @ObjectIdColumn()
   // tslint:disable-next-line
   _id: ObjectID;
-
 
   @Column()
   name: string;
 
   @Column()
   instructor: ObjectID[] = [];
+
+  @Column()
+  student: ObjectID[] = [];
 
   @Column()
   instructions: string; // this is the instructor’s notes on what should be accomplished.

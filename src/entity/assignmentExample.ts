@@ -30,6 +30,9 @@ createConnection({
     // Uncomment to run functions to populate mock data:
 
     // await createAssignment(userRepository, assignmentRepository, manager);
+    // Uncomment to run functions to populate mock data:
+
+    // await createAssignment(userRepository, assignmentRepository, manager);
 
     // Assignment to each member of cohort
 
@@ -42,15 +45,9 @@ createConnection({
     // Student hands in deliverable with URL:
     // Student pulls a particular deliverable from the list of deliverables
 
-    // const cindieB = await userRepository.findOne('5c5b896c7215241d1d2da7e4');
-    // console.log(cindieB.deliverables[0].instructions);
-
     // // It gets marked turned in.
 
-    // cindieB.deliverables[0].turnedIn = new Date();
-    // cindieB.deliverables[0].deliverable = 'www.google.com';
-    // // 1st CindieB tells what to update, 2nd updates it with CindieB as updated
-    // await userRepository.update(cindieB, cindieB);
+    // Instructor can find all turned in deliverables
 
     // Instructor can find all turned in deliverables
 
