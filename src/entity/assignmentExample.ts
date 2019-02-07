@@ -16,7 +16,7 @@ createConnection({
   host: process.env.MONGO_URL,
   port: Number(process.env.MONGO_PORT),
   database: 'test3',
-  entities: [Assignment, Cohort, User],
+  entities: [Assignment, Cohort, Deliverable, User],
   useNewUrlParser: true,
   synchronize: true,
   logging: false,
@@ -36,11 +36,7 @@ createConnection({
 
     // Assignment to each member of cohort
 
-    // await assignmentToDeliverables(
-    //   assignmentRepository,
-    //   cohortRepository,
-    //   userRepository,
-    // );
+    await assignmentToDeliverables();
 
     // Student hands in deliverable with URL:
     // Student pulls a particular deliverable from the list of deliverables
@@ -51,51 +47,53 @@ createConnection({
 
     // Instructor can find all turned in deliverables
 
-    const users = await userRepository.find();
-    const students = users
-      .filter(s => s.role === 'student')
-      .filter(s => s.deliverables.length >= 1)
-      .map(s => ({ student: s._id, deliverables: s.deliverables }));
-    // console.log(students);
-    // Also pass down student name.
+    // const users = await userRepository.find();
+    // const students = users
+    //   .filter(s => s.role === 'student')
+    //   .filter(s => s.deliverables.length >= 1)
+    //   .map(s => ({ student: s._id, deliverables: s.deliverables }));
+    // // console.log(students);
+    // // Also pass down student name.
 
-    const flatSingle = arr => [].concat(...arr);
+    // const flatSingle = arr => [].concat(...arr);
 
-    const flattenedStudents = flatSingle(
-      students.map(eachFlatStudent =>
-        eachFlatStudent.deliverables.map(deliverable => ({
-          student: eachFlatStudent.student,
-          // tslint:disable-next-line
-          deliverable: deliverable,
-        })),
-      ),
-    );
-    const studentDeliverables = flattenedStudents.map(studentDeliverable => ({
-      student: studentDeliverable.student,
-      turnedIn: studentDeliverable.deliverable.turnedIn,
-      deliverableName: studentDeliverable.deliverable.name,
-      deliverableUrl: studentDeliverable.deliverable.deliverable,
-      deliverableId: studentDeliverable.deliverable._id,
-    }));
+    // const flattenedStudents = flatSingle(
+    //   students.map(eachFlatStudent =>
+    //     eachFlatStudent.deliverables.map(deliverable => ({
+    //       student: eachFlatStudent.student,
+    //       // tslint:disable-next-line
+    //       deliverable: deliverable,
+    //     })),
+    //   ),
+    // );
+    // const studentDeliverables = flattenedStudents.map(studentDeliverable => ({
+    //   student: studentDeliverable.student,
+    //   turnedIn: studentDeliverable.deliverable.turnedIn,
+    //   deliverableName: studentDeliverable.deliverable.name,
+    //   deliverableUrl: studentDeliverable.deliverable.deliverable,
+    //   deliverableId: studentDeliverable.deliverable._id,
+    // }));
 
-    const turnedIn = studentDeliverables.filter(
-      d => d.turnedIn !== null && d.turnedIn !== undefined,
-    );
+    // const turnedIn = studentDeliverables.filter(
+    //   d => d.turnedIn !== null && d.turnedIn !== undefined,
+    // );
 
     // Intructor can mark as completed and with a grade.
 
-    const toMarkDone = await userRepository.findOne(turnedIn[0].student);
-    console.log(toMarkDone);
+    // const toMarkDone = await userRepository.findOne(turnedIn[0].student);
+    // console.log(toMarkDone);
   } catch (error) {
     console.log('Something went wrong', error);
   }
 });
 
-async function assignmentToDeliverables(
-  assignmentRepository,
-  cohortRepository,
-  userRepository,
-) {
+async function assignmentToDeliverables() {
+  const userRepository = getRepository(User);
+  const assignmentRepository = getRepository(Assignment);
+  const cohortRepository = getRepository(Cohort);
+  const deliverableRepository = getRepository(Deliverable);
+  const manager = getMongoManager();
+
   const thisAssignment = await assignmentRepository.findOne();
   console.log(thisAssignment);
   // Pull out a cohort
@@ -104,19 +102,20 @@ async function assignmentToDeliverables(
   });
   thisCohort.students.forEach(async student => {
     // For each id in cohort, pull a student
-    const thisStudent = await userRepository.findOne({ _id: student });
     // Create a new Deliverable, copying assignment into new deliverable
-    const studentDeliverable = new Deliverable();
-    studentDeliverable.name = thisAssignment.name;
-    studentDeliverable.instructions = thisAssignment.instructions;
-    studentDeliverable.instructor = thisAssignment.instructor;
-    studentDeliverable.resourcesUrls = thisAssignment.resourcesUrls;
-    studentDeliverable.topics = thisAssignment.topics;
-    studentDeliverable.deadline = new Date('2019-02-11');
-    studentDeliverable._id = nanoid();
+    const deliverable = new Deliverable();
+    deliverable.name = thisAssignment.name;
+    deliverable.student.push(student);
+    deliverable.instructions = thisAssignment.instructions;
+    deliverable.instructor = thisAssignment.instructor;
+    deliverable.resourcesUrls = thisAssignment.resourcesUrls;
+    deliverable.topics = thisAssignment.topics;
+    deliverable.deadline = new Date('2019-02-11');
+
+    const savedDeliverable = await manager.save(deliverable);
+    console.log(savedDeliverable);
+
     // Push deliverable
-    thisStudent.deliverables.push(studentDeliverable);
-    await userRepository.update(thisStudent, thisStudent);
   });
 }
 
@@ -135,7 +134,21 @@ async function createAssignment(userRepository, assignmentRepository, manager) {
     'https://zety.com/blog/how-to-make-a-resume',
     'https://www.thebalancecareers.com/how-to-create-a-professional-resume-2063237',
   ];
-  const createdAssignment = await assignmentRepository.create(assignment1);
-  const savedAssignment = await manager.save(createdAssignment);
-  console.log(savedAssignment);
+  const createdAssignment1 = await assignmentRepository.create(assignment1);
+  const savedAssignment1 = await manager.save(createdAssignment1);
+  console.log(savedAssignment1);
+
+  const assignment2: Assignment = new Assignment();
+  assignment2.name = 'Resume';
+  assignment2.instructor.push(someIntructor._id);
+  assignment2.version = 1;
+  assignment2.cohortType = ['WDI', 'UXDI', 'DSI'];
+  assignment2.cohortWeek = '1';
+  assignment2.instructions = 'Create a cover letter';
+  assignment2.resourcesUrls = [
+    'https://zety.com/blog/how-to-make-a-cover-letter',
+  ];
+  const createdAssignment2 = await assignmentRepository.create(assignment2);
+  const savedAssignment2 = await manager.save(createdAssignment2);
+  console.log(savedAssignment2);
 }
