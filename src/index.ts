@@ -15,14 +15,14 @@ import { Deliverable } from './entity/Deliverable';
 import { Topic } from './entity/Topic';
 import { User } from './entity/User';
 
-// End of upload required packages
-
 createConnection({
   type: 'mongodb',
-  host: process.env.MONGO_URL,
-  port: Number(process.env.MONGO_PORT),
-  database: 'test3',
+  host: process.env.MONGODB_URI,
+  port: Number(process.env.MONGODB_PORT),
+  database: process.env.MONGODB_DB_NAME,
   entities: [Assignment, Cohort, Deliverable, Topic, User],
+  username: process.env.MONGODB_USERNAME,
+  password: process.env.MONGODB_PASSWORD,
   useNewUrlParser: true,
   synchronize: true,
   logging: false,
@@ -44,7 +44,6 @@ createConnection({
     app.use(cors());
     app.use(express.json({ limit: '50mb' }));
     app.use(express.urlencoded({ extended: false }));
-
 
     /* ****************************************
     //*             Routes

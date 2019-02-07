@@ -40,9 +40,9 @@ createConnection({
       deadline: new Date('2019-02-17'),
     };
 
-    const createdAssignment = await assignmentRepository.create(Assignment1);
-    const savedAssignment = await manager.save(createdAssignment);
-    console.log(savedAssignment);
+    // const createdAssignment = await assignmentRepository.create(Assignment1);
+    // const savedAssignment = await manager.save(createdAssignment);
+    // console.log(savedAssignment);
   } catch (error) {
     console.log('Something went wrong', error);
   }

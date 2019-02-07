@@ -1,3 +1,8 @@
+// tslint:disable:no-var-requires
+const en = require('nanoid-good/locale/en');
+const nanoid = require('nanoid-good')(en);
+// tslint:enable:no-var-requires
+
 import { createConnection, getMongoManager, getRepository } from 'typeorm';
 
 import { Assignment } from './Assignment';
@@ -34,34 +39,58 @@ createConnection({
     //   userRepository,
     // );
 
-    // // Student hands in deliverable with URL:
-    // // Student pulls a particular deliverable from the list of deliverables
+    // Student hands in deliverable with URL:
+    // Student pulls a particular deliverable from the list of deliverables
 
-    // const cindieB = await userRepository.findOne('5c5a0fd8b5892d3b41aeed83');
+    // const cindieB = await userRepository.findOne('5c5b896c7215241d1d2da7e4');
     // console.log(cindieB.deliverables[0].instructions);
 
     // // It gets marked turned in.
 
     // cindieB.deliverables[0].turnedIn = new Date();
+    // cindieB.deliverables[0].deliverable = 'www.google.com';
     // // 1st CindieB tells what to update, 2nd updates it with CindieB as updated
     // await userRepository.update(cindieB, cindieB);
 
-    // // Instructor can find all turned in deliverables
+    // Instructor can find all turned in deliverables
 
     const users = await userRepository.find();
     const students = users
       .filter(s => s.role === 'student')
       .filter(s => s.deliverables.length >= 1)
       .map(s => ({ student: s._id, deliverables: s.deliverables }));
-    console.log(students);
+    // console.log(students);
+    // Also pass down student name.
 
+    const flatSingle = arr => [].concat(...arr);
+
+    const flattenedStudents = flatSingle(
+      students.map(eachFlatStudent =>
+        eachFlatStudent.deliverables.map(deliverable => ({
+          student: eachFlatStudent.student,
+          deliverable: deliverable,
+        })),
+      ),
+    );
+    const studentDeliverables = flattenedStudents.map(studentDeliverable => ({
+      student: studentDeliverable.student,
+      turnedIn: studentDeliverable.deliverable.turnedIn,
+      deliverableName: studentDeliverable.deliverable.name,
+      deliverableUrl: studentDeliverable.deliverable.deliverable,
+      deliverableId: studentDeliverable.deliverable._id,
+    }));
+
+    const turnedIn = studentDeliverables.filter(
+      d => d.turnedIn !== null && d.turnedIn !== undefined,
+    );
+    console.log(turnedIn);
     // const turnedIn = students.filter(student =>
     //   student.deliverables.filter(deliverable => deliverable.turnedIn !== null),
     // );
 
     // console.log(turnedIn.forEach(e => e.deliverables[0].turnedIn));
 
-    // Intructor can mark as completed and with a grad.
+    // Intructor can mark as completed and with a grade.
   } catch (error) {
     console.log('Something went wrong', error);
   }
@@ -81,7 +110,6 @@ async function assignmentToDeliverables(
   thisCohort.students.forEach(async student => {
     // For each id in cohort, pull a student
     const thisStudent = await userRepository.findOne({ _id: student });
-    console.log(thisStudent.firstName);
     // Create a new Deliverable, copying assignment into new deliverable
     const studentDeliverable = new Deliverable();
     studentDeliverable.name = thisAssignment.name;
@@ -90,6 +118,7 @@ async function assignmentToDeliverables(
     studentDeliverable.resourcesUrls = thisAssignment.resourcesUrls;
     studentDeliverable.topics = thisAssignment.topics;
     studentDeliverable.deadline = new Date('2019-02-11');
+    studentDeliverable._id = nanoid();
     // Push deliverable
     thisStudent.deliverables.push(studentDeliverable);
     await userRepository.update(thisStudent, thisStudent);

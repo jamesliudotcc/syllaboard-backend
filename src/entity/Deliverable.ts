@@ -6,6 +6,7 @@ export class Deliverable {
   // tslint:disable-next-line
   _id: ObjectID;
 
+
   @Column()
   name: string;
 
