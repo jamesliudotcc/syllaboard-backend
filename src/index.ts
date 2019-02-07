@@ -51,7 +51,7 @@ createConnection({
 
     app.use('/auth', require('./controllers/auth'));
     app.use('/cohort', require('./controllers/cohort'));
-
+    app.use('/admin', require('./controllers/admin'))
     app.get('*', (req, res, next) => {
       res.status(404).send({ message: 'Not Found' });
     });

@@ -68,15 +68,15 @@ Turn the .env.example into a .env. The random looking strings are random nonsens
 | /instructor/deliverable/grade/:id  | POST      | Set grade to a deliverable                |
 |                                    | POST      | Bulk grade deliverables                   |
 | **Admin Routes**                   |           |                                           |
-| /admin/users                       | POST      | Create user                               |
-| /admin/users                       | GET       | Show all users {filter}                   |
+| /admin/users                       | POST ??   | Create user                               |
+| /admin/users                       | GET       | Show all users {filter} 1                 |
 | /admin/users/:id                   | GET       | Show particular user                      |
-| /admin/users/:id                   | PUT       | Edit a user                               |
-| /admin/users/:id                   | DELETE    | Delete a user                             |
-| /admin/cohort                      | POST      | Create a cohort                           |
-| /admin/cohort                      | GET       | Show chorts, filter by ...                |
-| /admin/cohort/:id                  | PUT       | Edit a cohort                             |
-| /admin/cohort/:id                  | DELETE    | Delete a cohort                           |
+| /admin/users/:id                   | PUT       | Edit a user 6                             |
+| /admin/users/:id                   | DELETE    | Delete a user 3                           |
+| /admin/cohort                      | POST      | Create a cohort 7                          |
+| /admin/cohort                      | GET       | Show chorts, filter by ... 2              |
+| /admin/cohort/:id                  | PUT       | Edit a cohort 5                           |
+| /admin/cohort/:id                  | DELETE    | Delete a cohort 4                         |
 | **User Routes**                    |           |                                           |
 | /user/:id                          | GET       | User info                                 |
 | /user/deliverable/:id              | GET       | Show page, as required for submit form    |
