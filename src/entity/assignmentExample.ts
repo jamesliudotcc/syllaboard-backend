@@ -106,6 +106,7 @@ async function assignmentToDeliverables() {
     const deliverable = new Deliverable();
     deliverable.name = thisAssignment.name;
     deliverable.student.push(student);
+    deliverable.cohort.push(thisCohort._id);
     deliverable.instructions = thisAssignment.instructions;
     deliverable.instructor = thisAssignment.instructor;
     deliverable.resourcesUrls = thisAssignment.resourcesUrls;

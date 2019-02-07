@@ -17,6 +17,9 @@ export class Deliverable {
   student: ObjectID[] = [];
 
   @Column()
+  cohort: ObjectID[] = [];
+
+  @Column()
   instructions: string; // this is the instructor’s notes on what should be accomplished.
 
   @Column()
