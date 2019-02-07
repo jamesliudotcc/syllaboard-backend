@@ -68,6 +68,7 @@ createConnection({
       students.map(eachFlatStudent =>
         eachFlatStudent.deliverables.map(deliverable => ({
           student: eachFlatStudent.student,
+          // tslint:disable-next-line
           deliverable: deliverable,
         })),
       ),
@@ -83,14 +84,11 @@ createConnection({
     const turnedIn = studentDeliverables.filter(
       d => d.turnedIn !== null && d.turnedIn !== undefined,
     );
-    console.log(turnedIn);
-    // const turnedIn = students.filter(student =>
-    //   student.deliverables.filter(deliverable => deliverable.turnedIn !== null),
-    // );
-
-    // console.log(turnedIn.forEach(e => e.deliverables[0].turnedIn));
 
     // Intructor can mark as completed and with a grade.
+
+    const toMarkDone = await userRepository.findOne(turnedIn[0].student);
+    console.log(toMarkDone);
   } catch (error) {
     console.log('Something went wrong', error);
   }
