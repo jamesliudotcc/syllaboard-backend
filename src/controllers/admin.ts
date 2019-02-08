@@ -132,7 +132,7 @@ router.get('/cohorts', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/cohorts', async (req, res) => {
+router.post('/cohorts', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
   }
@@ -150,7 +150,9 @@ router.post('/cohorts', async (req, res) => {
     const createdCohort = await cohortRepository.create(newCohort);
     const savedCohort = await manager.save(createdCohort);
     const mintedCohort = await cohortRepository.findOne(savedCohort);
-    res.send(mintedCohort);
+    res.send({
+      cohort: mintedCohort,
+    });
   } catch (error) {
     console.log('Error with admin/cohort/ POST route:', error);
     return res.status(503).send({ user: null });
