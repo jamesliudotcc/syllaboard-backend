@@ -1,7 +1,7 @@
 // TypeORM setup
-import { getRepository } from 'typeorm';
+import { getMongoRepository } from 'typeorm';
 import { User } from '../entity/User';
-const userRepository = getRepository(User);
+const userRepository = getMongoRepository(User);
 
 // Passport
 import passport = require('passport');
@@ -37,7 +37,7 @@ const localLogin = new LocalStrategy(
   },
 );
 
-// Setup options for JWT strategy, used all JWT strategies below
+// Setup options for JWT strategy
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromHeader('authorization'),
