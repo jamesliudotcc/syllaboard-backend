@@ -49,9 +49,14 @@ createConnection({
     //*             Routes
     ******************************************/
 
+    app.use('/admin', require('./controllers/admin'));
     app.use('/auth', require('./controllers/auth'));
     app.use('/cohort', require('./controllers/cohort'));
-    app.use('/admin', require('./controllers/admin'))
+    app.use('/instructor', require('./controllers/instructor'));
+    app.use('/student', require('./controllers/student'));
+
+    // Catchall Route
+
     app.get('*', (req, res, next) => {
       res.status(404).send({ message: 'Not Found' });
     });

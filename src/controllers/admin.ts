@@ -1,5 +1,4 @@
 import * as express from 'express';
-import jwt = require('jsonwebtoken');
 
 // TypeORM setup
 import { getMongoManager, getMongoRepository } from 'typeorm';
@@ -98,7 +97,7 @@ router.put('/users/:id', requireAuth, async (req, res) => {
       edited: updatedUser,
     });
   } catch (error) {
-    console.log('Error with admin/cohort/ POST route:', error);
+    console.log('Error with admin/user/ PUT route:', error);
     return res.status(503).send({ user: null });
   }
 });
@@ -199,15 +198,20 @@ router.delete('/cohorts/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/cohorts/instructors/:id', async (req, res) => {
+router.put('/cohorts/instructors/:id', requireAuth, async (req, res) => {
   // Body should be an array of userIds as JSON (application/json)
+  // :id refers to the ID of the cohort to be edited.
 
-  // TODO Protect route
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
+
   try {
     console.log('In add instrutor to cohort route');
 
     const toEditCohort = await cohortRepository.findOne(req.params.id);
 
+    // TODO: Learn promsie all and refactor. Not today.
     req.body.forEach(async userId => {
       const eachUser = await usersRepository.findOne(userId);
       if (eachUser.role === 'instructor') {
@@ -228,6 +232,10 @@ router.put('/cohorts/instructors/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+/*************************************** */
+//          Validation Functions
+/*************************************** */
 
 function validateCohort(
   toEditCohort: Cohort,
