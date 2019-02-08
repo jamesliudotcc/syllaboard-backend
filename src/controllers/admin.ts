@@ -18,7 +18,6 @@ const router = express.Router();
 // tslint:disable-next-line:no-var-requires
 const passportService = require('../services/passport');
 import passport = require('passport');
-import { read } from 'fs';
 
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
