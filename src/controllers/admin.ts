@@ -55,7 +55,17 @@ router.post('/users', async (req, res) => {
   //   }
 
   try {
-    res.send(req.body);
+    console.log(req.body);
+    const newUser = new User();
+    newUser.firstName = req.body.firstName;
+    newUser.lastName = req.body.lastName;
+    newUser.email = req.body.email;
+    newUser.password = req.body.password;
+    newUser.role = 'student';
+
+    const createdUser = await usersRepository.create(newUser);
+    const savedUser = await manager.save(createdUser);
+    res.send(savedUser);
   } catch (error) {
     console.log('Error with /admin/users POST route:', error);
     return res.status(503).send({ user: null });
@@ -105,17 +115,41 @@ router.post('/cohorts', async (req, res) => {
     const createdCohort = await cohortRepository.create(newCohort);
     const savedCohort = await manager.save(createdCohort);
     res.send(savedCohort);
+  } catch (error) {
+    console.log('Error with admin/cohort/ POST route:', error);
+    return res.status(503).send({ user: null });
+  }
+});
 
-    // const cohort = await cohortRepository.findOne({ name: req.body.name });
+router.put('/cohorts/:id', async (req, res) => {
+  try {
+    console.log('In the PUT /admin/cohort');
 
-    // if (cohort) {
-    //   return res.status(409).send('Cohort already exists');
-    // }
+    const toEditCohort = await cohortRepository.findOne(req.params.id);
+    const editedCohort = { ...toEditCohort };
 
-    // const createdCohort = await cohortRepository.create(req.body);
-    // const savedCohort = await manager.save(createdCohort);
+    switch (true) {
+      case req.body.name !== null: // This is terrible!
+        editedCohort.name = req.body.name;
+      case req.body.campus !== null:
+        editedCohort.campus = req.body.campus;
+      case req.body.startDate != null:
+        console.log(req.body.startDate);
+        editedCohort.startDate = new Date(req.body.startDate);
+      case req.body.endDate != null:
+        editedCohort.endDate = new Date(req.body.endDate);
+        break; // Only break at the very end, try everything
+    }
 
-    // return res.send(req.params.id);
+    console.log(await cohortRepository.findOne(toEditCohort));
+    console.log(editedCohort);
+    const updatedCohort = await cohortRepository.updateOne(toEditCohort, {
+      $set: editedCohort,
+    });
+
+    res.send({
+      edited: updatedCohort,
+    });
   } catch (error) {
     console.log('Error with admin/cohort/ POST route:', error);
     return res.status(503).send({ user: null });
