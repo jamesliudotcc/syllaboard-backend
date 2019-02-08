@@ -26,8 +26,12 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 //             Controllers
 /*************************************** */
 
-router.get('/users', async (req, res) => {
+router.get('/users', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
   try {
+    console.log('User attempting to see list of users is a:', req.user.role);
     const users = await usersRepository.find({});
     return res.send({ users });
   } catch (error) {
@@ -36,7 +40,7 @@ router.get('/users', async (req, res) => {
   }
 });
 
-router.get('/users/:id', async (req, res) => {
+router.get('/users/:id', requireAuth, async (req, res) => {
   try {
     const user = await usersRepository.findOneOrFail(req.params.id);
     return res.send({ user });
@@ -46,7 +50,7 @@ router.get('/users/:id', async (req, res) => {
   }
 });
 
-router.post('/users', async (req, res) => {
+router.post('/users', requireAuth, async (req, res) => {
   console.log('In the POST /users');
   console.log(req.body);
 
@@ -72,7 +76,7 @@ router.post('/users', async (req, res) => {
   }
 });
 
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', requireAuth, async (req, res) => {
   try {
     console.log(`DELETE user ${req.params.id}`);
 
@@ -86,7 +90,7 @@ router.delete('/users/:id', async (req, res) => {
   }
 });
 
-router.get('/cohorts', async (req, res) => {
+router.get('/cohorts', requireAuth, async (req, res) => {
   try {
     const cohorts = await cohortRepository.find({});
     return res.send({ cohorts });
@@ -121,7 +125,7 @@ router.post('/cohorts', async (req, res) => {
   }
 });
 
-router.put('/cohorts/:id', async (req, res) => {
+router.put('/cohorts/:id', requireAuth, async (req, res) => {
   try {
     console.log('In the PUT /admin/cohort');
 
@@ -142,7 +146,7 @@ router.put('/cohorts/:id', async (req, res) => {
   }
 });
 
-router.delete('/cohorts/:id', async (req, res) => {
+router.delete('/cohorts/:id', requireAuth, async (req, res) => {
   try {
     console.log(`DELETE cohort ${req.params.id}`);
 

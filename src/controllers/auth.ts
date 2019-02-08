@@ -47,7 +47,7 @@ router.post('/signin', requireSignIn, (req, res) => {
 /* GET /auth/test - Require JWT, Return message */
 router.get('/test', requireAuth, (req, res) => {
   console.log('In /auth/test');
-  return res.send({ message: 'Hello There!' });
+  return res.send({ message: 'Hello There!', role: req.user.role });
 });
 
 /* GET /auth/signup - Take user data and create new user in db, return JWT */
