@@ -88,7 +88,7 @@ router.post('/signup', async (req, res) => {
 
       const instructorToken = createToken(savedInstructor);
       const instructorRole = savedInstructor.role;
-      return res.send({ instructorToken, instructorRole });
+      return res.send({ token: instructorToken, role: instructorRole });
     }
 
     // Check if is key is for student
@@ -100,14 +100,14 @@ router.post('/signup', async (req, res) => {
 
       console.log('Saved Student:', savedStudent);
 
-      // Add student id to cohort
+      // Add instructor id to cohort
       const newStudent = await userRepository.findOne({ email: savedStudent.email });
       studentCohort.students.push(newStudent._id);
       await cohortRepository.save(studentCohort);
 
       const studentToken = createToken(savedStudent);
       const studentRole = savedStudent.role;
-      return res.send({ studentToken, studentRole });
+      return res.send({ token: studentToken, role: studentRole });
     }
 
     return res.status(409).send('No cohort found');
