@@ -1,5 +1,11 @@
 # Syllaboard Backend
 
+## Usability considerations
+
+One aspect of usability that we considered, but decided not to implement, regards legacy browsers and slow internet connections. However, consider our target audience: coding school instructors, administrators, and students. The schools are located in metropolitan areas where fast internet is readily available, and any remote students require fast internet connections to be able to consume the course content. Administrators and instructors will often be working at school facilities on recent hardware with good Wifi. Even our larger JSON data payloads are not particularly big: so far it is mostliy assignment metadata.
+
+We did design for mobile first.
+
 ## Things to add
 
 Turn the .env.example into a .env. The random looking strings are random nonsense we pulled from a [random string generator service](https://www.grc.com/passwords.htm). They are different from what we are using for the project. .env.example is an example. You should generate similarly long random strings!
@@ -73,7 +79,7 @@ Turn the .env.example into a .env. The random looking strings are random nonsens
 | /admin/users/:id                   | GET       | Show particular user                      |
 | /admin/users/:id                   | PUT       | Edit a user 6                             |
 | /admin/users/:id                   | DELETE    | Delete a user 3                           |
-| /admin/cohort                      | POST      | Create a cohort 7                          |
+| /admin/cohort                      | POST      | Create a cohort 7                         |
 | /admin/cohort                      | GET       | Show chorts, filter by ... 2              |
 | /admin/cohort/:id                  | PUT       | Edit a cohort 5                           |
 | /admin/cohort/:id                  | DELETE    | Delete a cohort 4                         |
