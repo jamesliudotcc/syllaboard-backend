@@ -68,6 +68,33 @@ router.get('/cohorts', async (req, res) => {
   }
 });
 
+router.post('/cohorts', async (req, res) => {
+  console.log('In the POST cohort/new');
+  console.log(req.body);
+
+  //   if (!req.user) {
+  //     return res.status(401).send({ user: null });
+  //   }
+
+  try {
+    res.send(req.body);
+
+    // const cohort = await cohortRepository.findOne({ name: req.body.name });
+
+    // if (cohort) {
+    //   return res.status(409).send('Cohort already exists');
+    // }
+
+    // const createdCohort = await cohortRepository.create(req.body);
+    // const savedCohort = await manager.save(createdCohort);
+
+    // return res.send(req.params.id);
+  } catch (error) {
+    console.log('Error with /cohort/new POST route:', error);
+    return res.status(503).send({ user: null });
+  }
+});
+
 router.delete('/cohorts/:id', async (req, res) => {
   try {
     console.log(`DELETE cohort ${req.params.id}`);
