@@ -18,7 +18,10 @@ export class Cohort {
   _id: ObjectID;
 
   @Column()
-  key: string;
+  studentKey: string;
+
+  @Column()
+  instructorKey: string;
 
   @Column()
   name: string;
@@ -40,6 +43,7 @@ export class Cohort {
 
   @BeforeInsert()
   generateKey() {
-    this.key = nanoid();
+    this.studentKey = nanoid();
+    this.instructorKey = nanoid();
   }
 }
