@@ -22,7 +22,9 @@ import passport = require('passport');
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
 
-// Controllers
+/*************************************** */
+//             Controllers
+/*************************************** */
 
 router.get('/users', async (req, res) => {
   try {
@@ -85,7 +87,7 @@ router.get('/cohorts', async (req, res) => {
 });
 
 router.post('/cohorts', async (req, res) => {
-  console.log('In the POST cohort/new');
+  console.log('In the POST /admin/cohort');
   console.log(req.body);
 
   //   if (!req.user) {
@@ -93,7 +95,16 @@ router.post('/cohorts', async (req, res) => {
   //   }
 
   try {
-    res.send(req.body);
+    console.log(req.body);
+    const newCohort = new Cohort();
+    newCohort.name = req.body.name;
+    newCohort.campus = req.body.campus;
+    newCohort.startDate = new Date(req.body.startDate);
+    newCohort.endDate = new Date(req.body.endDate);
+
+    const createdCohort = await cohortRepository.create(newCohort);
+    const savedCohort = await manager.save(createdCohort);
+    res.send(savedCohort);
 
     // const cohort = await cohortRepository.findOne({ name: req.body.name });
 
