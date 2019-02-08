@@ -41,6 +41,9 @@ router.get('/users', requireAuth, async (req, res) => {
 });
 
 router.get('/users/:id', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
   try {
     const user = await usersRepository.findOneOrFail(req.params.id);
     return res.send({ user });
@@ -51,12 +54,11 @@ router.get('/users/:id', requireAuth, async (req, res) => {
 });
 
 router.post('/users', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
   console.log('In the POST /users');
   console.log(req.body);
-
-  //   if (!req.user) {
-  //     return res.status(401).send({ user: null });
-  //   }
 
   try {
     console.log(req.body);
@@ -76,7 +78,34 @@ router.post('/users', requireAuth, async (req, res) => {
   }
 });
 
+router.put('/users/:id', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
+  try {
+    console.log('In the PUT /admin/user');
+
+    const toEditUser = await usersRepository.findOne(req.params.id);
+
+    const editedUser = validateUser(toEditUser, req.body);
+
+    const updatedUser = await usersRepository.updateOne(toEditUser, {
+      $set: editedUser,
+    });
+
+    res.send({
+      edited: updatedUser,
+    });
+  } catch (error) {
+    console.log('Error with admin/cohort/ POST route:', error);
+    return res.status(503).send({ user: null });
+  }
+});
+
 router.delete('/users/:id', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
   try {
     console.log(`DELETE user ${req.params.id}`);
 
@@ -91,6 +120,9 @@ router.delete('/users/:id', requireAuth, async (req, res) => {
 });
 
 router.get('/cohorts', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
   try {
     const cohorts = await cohortRepository.find({});
     return res.send({ cohorts });
@@ -101,12 +133,11 @@ router.get('/cohorts', requireAuth, async (req, res) => {
 });
 
 router.post('/cohorts', async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
   console.log('In the POST /admin/cohort');
   console.log(req.body);
-
-  //   if (!req.user) {
-  //     return res.status(401).send({ user: null });
-  //   }
 
   try {
     console.log(req.body);
@@ -126,6 +157,9 @@ router.post('/cohorts', async (req, res) => {
 });
 
 router.put('/cohorts/:id', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
   try {
     console.log('In the PUT /admin/cohort');
 
@@ -147,6 +181,9 @@ router.put('/cohorts/:id', requireAuth, async (req, res) => {
 });
 
 router.delete('/cohorts/:id', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
   try {
     console.log(`DELETE cohort ${req.params.id}`);
 
@@ -163,7 +200,7 @@ router.delete('/cohorts/:id', requireAuth, async (req, res) => {
 module.exports = router;
 
 function validateCohort(
-  toEditCohort,
+  toEditCohort: Cohort,
   incoming: any,
 ): { name?: string; campus?: string; startDate?: Date; endDate?: Date } {
   const editedCohort = { ...toEditCohort };
@@ -185,4 +222,30 @@ function validateCohort(
     : new Date(toEditCohort.endDate);
 
   return editedCohort;
+}
+
+function validateUser(
+  toEditUser: User,
+  incoming: any,
+): {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  role?: 'admin' | 'instructor' | 'student';
+} {
+  const editedUser = { ...toEditUser };
+
+  if (incoming.firstName) {
+    editedUser.firstName = incoming.firstName;
+  }
+  if (incoming.lastName) {
+    editedUser.lastName = incoming.lastName;
+  }
+  if (incoming.email) {
+    editedUser.email = incoming.email;
+  }
+  if (incoming.role) {
+    editedUser.role = incoming.role;
+  }
+  return editedUser;
 }
