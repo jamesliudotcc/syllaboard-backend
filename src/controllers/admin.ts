@@ -44,6 +44,22 @@ router.get('/users/:id', async (req, res) => {
   }
 });
 
+router.post('/users', async (req, res) => {
+  console.log('In the POST /users');
+  console.log(req.body);
+
+  //   if (!req.user) {
+  //     return res.status(401).send({ user: null });
+  //   }
+
+  try {
+    res.send(req.body);
+  } catch (error) {
+    console.log('Error with /admin/users POST route:', error);
+    return res.status(503).send({ user: null });
+  }
+});
+
 router.delete('/users/:id', async (req, res) => {
   try {
     console.log(`DELETE user ${req.params.id}`);
@@ -90,7 +106,7 @@ router.post('/cohorts', async (req, res) => {
 
     // return res.send(req.params.id);
   } catch (error) {
-    console.log('Error with /cohort/new POST route:', error);
+    console.log('Error with admin/cohort/ POST route:', error);
     return res.status(503).send({ user: null });
   }
 });
