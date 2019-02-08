@@ -126,23 +126,9 @@ router.put('/cohorts/:id', async (req, res) => {
     console.log('In the PUT /admin/cohort');
 
     const toEditCohort = await cohortRepository.findOne(req.params.id);
-    const editedCohort = { ...toEditCohort };
 
-    switch (true) {
-      case req.body.name !== null: // This is terrible!
-        editedCohort.name = req.body.name;
-      case req.body.campus !== null:
-        editedCohort.campus = req.body.campus;
-      case req.body.startDate != null:
-        console.log(req.body.startDate);
-        editedCohort.startDate = new Date(req.body.startDate);
-      case req.body.endDate != null:
-        editedCohort.endDate = new Date(req.body.endDate);
-        break; // Only break at the very end, try everything
-    }
+    const editedCohort = validateCohort(toEditCohort, req.body);
 
-    console.log(await cohortRepository.findOne(toEditCohort));
-    console.log(editedCohort);
     const updatedCohort = await cohortRepository.updateOne(toEditCohort, {
       $set: editedCohort,
     });
@@ -171,3 +157,28 @@ router.delete('/cohorts/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+function validateCohort(
+  toEditCohort,
+  incoming: any,
+): { name?: string; campus?: string; startDate?: Date; endDate?: Date } {
+  const editedCohort = { ...toEditCohort };
+
+  if (incoming.name) {
+    editedCohort.name = incoming.name;
+  }
+
+  if (incoming.campus) {
+    editedCohort.campus = incoming.campus;
+  }
+
+  editedCohort.startDate = incoming.startDate
+    ? new Date(incoming.startDate)
+    : new Date(toEditCohort.startDate);
+
+  editedCohort.endDate = incoming.endDate
+    ? new Date(incoming.endDate)
+    : new Date(toEditCohort.endDate);
+
+  return editedCohort;
+}
