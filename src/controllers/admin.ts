@@ -72,7 +72,8 @@ router.post('/users', requireAuth, async (req, res) => {
 
     const createdUser = await usersRepository.create(newUser);
     const savedUser = await manager.save(createdUser);
-    res.send(savedUser);
+    const mintedUser = await usersRepository.findOne(savedUser);
+    res.send(mintedUser);
   } catch (error) {
     console.log('Error with /admin/users POST route:', error);
     return res.status(503).send({ user: null });
@@ -150,7 +151,8 @@ router.post('/cohorts', async (req, res) => {
 
     const createdCohort = await cohortRepository.create(newCohort);
     const savedCohort = await manager.save(createdCohort);
-    res.send(savedCohort);
+    const mintedCohort = await cohortRepository.findOne(savedCohort);
+    res.send(mintedCohort);
   } catch (error) {
     console.log('Error with admin/cohort/ POST route:', error);
     return res.status(503).send({ user: null });
