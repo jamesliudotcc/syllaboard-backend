@@ -18,6 +18,7 @@ const router = express.Router();
 // tslint:disable-next-line:no-var-requires
 const passportService = require('../services/passport');
 import passport = require('passport');
+import { read } from 'fs';
 
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
@@ -127,7 +128,7 @@ router.get('/cohorts', requireAuth, async (req, res) => {
     const cohorts = await cohortRepository.find({});
     return res.send({ cohorts });
   } catch (error) {
-    console.log('Something went wrong', error);
+    console.log('Error with the admin/cohorts/ GET route', error);
     return res.send({ error: 'error' });
   }
 });
@@ -194,6 +195,25 @@ router.delete('/cohorts/:id', requireAuth, async (req, res) => {
   } catch (error) {
     console.log('Something went wrong', error);
     return res.send({ error: 'error' });
+  }
+});
+
+router.put('/cohorts/instructors/:id', async (req, res) => {
+  // Body should be an array of userIds as JSON (application/json)
+
+  // TODO Protect route
+  try {
+    console.log('In add instrutor to cohort route');
+    req.body.forEach(async userId => {
+      const eachUser = await usersRepository.findOne(userId);
+      if (eachUser) {
+        console.log(eachUser);
+      }
+    });
+    res.send({ cohort: req.params.id, body: req.body });
+  } catch (error) {
+    console.log('Error with admin/cohort/ POST route:', error);
+    return res.status(503).send({ user: null });
   }
 });
 
