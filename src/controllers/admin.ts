@@ -206,13 +206,22 @@ router.put('/cohorts/instructors/:id', async (req, res) => {
   // TODO Protect route
   try {
     console.log('In add instrutor to cohort route');
+
+    const toEditCohort = await cohortRepository.findOne(req.params.id);
+
     req.body.forEach(async userId => {
       const eachUser = await usersRepository.findOne(userId);
-      if (eachUser) {
+      if (eachUser.role === 'instructor') {
         console.log(eachUser);
+        console.log(toEditCohort);
+        await cohortRepository.updateOne(toEditCohort, {
+          $addToSet: { instructors: eachUser._id },
+        });
       }
     });
-    res.send({ cohort: req.params.id, body: req.body });
+
+    // Figure out a better message
+    res.status(202).send('ok');
   } catch (error) {
     console.log('Error with admin/cohort/ POST route:', error);
     return res.status(503).send({ user: null });
