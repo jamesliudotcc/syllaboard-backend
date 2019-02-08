@@ -3,12 +3,12 @@ import jwt = require('jsonwebtoken');
 // const jwt = require('jsonwebtoken');
 
 // TypeORM setup
-import { getManager, getRepository } from 'typeorm';
+import { getManager, getMongoRepository } from 'typeorm';
 import { Cohort } from '../entity/Cohort';
 import { User } from '../entity/User';
 
-const userRepository = getRepository(User);
-const cohortRepository = getRepository(Cohort);
+const userRepository = getMongoRepository(User);
+const cohortRepository = getMongoRepository(Cohort);
 const manager = getManager();
 
 // Express setup
@@ -40,7 +40,8 @@ const createToken = user =>
 /* POST /auth/signin - Require user/password, return JWT */
 router.post('/signin', requireSignIn, (req, res) => {
   const token = createToken(req.user);
-  return res.send({ token });
+  const role = req.user.role;
+  return res.send({ token, role });
 });
 
 // TODO: Remove this route after done testing
@@ -64,33 +65,52 @@ router.post('/signup', async (req, res) => {
   };
 
   try {
-    // Check if cohort 'Key' is valid
-    const cohort = await cohortRepository.findOne({ key: req.body.cohortKey });
-    if (!cohort) {
-      return res.status(409).send('No cohort found');
-    }
-
+    // If user exists, don't let them create a duplicate
     const user = await userRepository.findOne({ email: newUserData.email });
     console.log('Existing User:', user);
-
-    // If user exists, don't let them create a duplicate
     if (user) {
       return res.status(409).send('User already exists');
     }
 
-    // TODO: Add some validations
-    const createdUser = await userRepository.create(newUserData);
-    const savedUser = await manager.save(createdUser);
+    // Check if is key is for instructor
+    const instructorCohort = await cohortRepository.findOne({ instructorKey: req.body.cohortKey });
+    if (instructorCohort) {
+      const createdInstructor = await userRepository.create(newUserData);
+      createdInstructor.role = 'instructor';
+      const savedInstructor = await manager.save(createdInstructor);
 
-    console.log('Saved User:', savedUser);
+      console.log('Saved Instructor:', savedInstructor);
 
-    // Add student id to cohort
-    const newStudent = await userRepository.findOne({ email: savedUser.email });
-    cohort.students.push(newStudent._id);
-    await cohortRepository.save(cohort);
+      // Add instructor id to cohort
+      const newInstructor = await userRepository.findOne({ email: savedInstructor.email });
+      instructorCohort.instructors.push(newInstructor._id);
+      await cohortRepository.save(instructorCohort);
 
-    const token = createToken(savedUser);
-    return res.send({ token });
+      const instructorToken = createToken(savedInstructor);
+      const instructorRole = savedInstructor.role;
+      return res.send({ instructorToken, instructorRole });
+    }
+
+    // Check if is key is for student
+    const studentCohort = await cohortRepository.findOne({ studentKey: req.body.cohortKey });
+    if (studentCohort) {
+      const createdStudent = await userRepository.create(newUserData);
+      createdStudent.role = 'student';
+      const savedStudent = await manager.save(createdStudent);
+
+      console.log('Saved Student:', savedStudent);
+
+      // Add student id to cohort
+      const newStudent = await userRepository.findOne({ email: savedStudent.email });
+      studentCohort.students.push(newStudent._id);
+      await cohortRepository.save(studentCohort);
+
+      const studentToken = createToken(savedStudent);
+      const studentRole = savedStudent.role;
+      return res.send({ studentToken, studentRole });
+    }
+
+    return res.status(409).send('No cohort found');
   } catch (err) {
     console.log('Error in POST /auth/signup', err);
     return res.status(503).send('Database Error');
