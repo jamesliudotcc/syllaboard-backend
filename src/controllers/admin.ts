@@ -200,12 +200,12 @@ router.put('/cohorts/:id', requireAuth, async (req, res) => {
     // TODO: refactor: change name of validateCohort to editCohort
     const editedCohort = validateCohort(toEditCohort, req.body);
 
-    const updatedCohort = await cohortRepository.updateOne(toEditCohort, {
+    await cohortRepository.updateOne(toEditCohort, {
       $set: editedCohort,
     });
 
     res.send({
-      edited: updatedCohort,
+      edited: editedCohort,
     });
   } catch (error) {
     console.log('Error with admin/cohort/ POST route:', error);
