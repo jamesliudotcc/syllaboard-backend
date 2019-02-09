@@ -55,7 +55,6 @@ router.get('/test', requireAuth, (req, res) => {
 router.post('/signup', async (req, res) => {
   // TODO: debug statements; remove when no longer needed
   console.log('In the POST /auth/signup route');
-  console.log(req.body);
 
   const newUserData = {
     firstName: req.body.firstName,
@@ -67,13 +66,15 @@ router.post('/signup', async (req, res) => {
   try {
     // If user exists, don't let them create a duplicate
     const user = await userRepository.findOne({ email: newUserData.email });
-    console.log('Existing User:', user);
+    console.log('Existing User:', user.firstName);
     if (user) {
       return res.status(409).send('User already exists');
     }
 
     // Check if is key is for instructor
-    const instructorCohort = await cohortRepository.findOne({ instructorKey: req.body.cohortKey });
+    const instructorCohort = await cohortRepository.findOne({
+      instructorKey: req.body.cohortKey,
+    });
     if (instructorCohort) {
       const createdInstructor = await userRepository.create(newUserData);
       createdInstructor.role = 'instructor';
@@ -82,7 +83,9 @@ router.post('/signup', async (req, res) => {
       console.log('Saved Instructor:', savedInstructor);
 
       // Add instructor id to cohort
-      const newInstructor = await userRepository.findOne({ email: savedInstructor.email });
+      const newInstructor = await userRepository.findOne({
+        email: savedInstructor.email,
+      });
       instructorCohort.instructors.push(newInstructor._id);
       await cohortRepository.save(instructorCohort);
 
@@ -92,7 +95,9 @@ router.post('/signup', async (req, res) => {
     }
 
     // Check if is key is for student
-    const studentCohort = await cohortRepository.findOne({ studentKey: req.body.cohortKey });
+    const studentCohort = await cohortRepository.findOne({
+      studentKey: req.body.cohortKey,
+    });
     if (studentCohort) {
       const createdStudent = await userRepository.create(newUserData);
       createdStudent.role = 'student';
@@ -101,7 +106,9 @@ router.post('/signup', async (req, res) => {
       console.log('Saved Student:', savedStudent);
 
       // Add instructor id to cohort
-      const newStudent = await userRepository.findOne({ email: savedStudent.email });
+      const newStudent = await userRepository.findOne({
+        email: savedStudent.email,
+      });
       studentCohort.students.push(newStudent._id);
       await cohortRepository.save(studentCohort);
 

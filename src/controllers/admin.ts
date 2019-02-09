@@ -25,6 +25,13 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 //             Controllers
 /*************************************** */
 
+router.get('/', requireAuth, (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
+  return res.send({ user: req.user });
+});
+
 router.get('/users', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
@@ -71,7 +78,7 @@ router.post('/users', requireAuth, async (req, res) => {
     const createdUser = await usersRepository.create(newUser);
     const savedUser = await manager.save(createdUser);
     const mintedUser = await usersRepository.findOne(savedUser);
-    res.send(mintedUser);
+    res.send({ user: mintedUser });
   } catch (error) {
     console.log('Error with /admin/users POST route:', error);
     return res.status(503).send({ user: null });
@@ -87,7 +94,7 @@ router.put('/users/:id', requireAuth, async (req, res) => {
 
     const toEditUser = await usersRepository.findOne(req.params.id);
 
-    const editedUser = validateUser(toEditUser, req.body);
+    const editedUser = editUser(toEditUser, req.body);
 
     const updatedUser = await usersRepository.updateOne(toEditUser, {
       $set: editedUser,
@@ -198,7 +205,7 @@ router.put('/cohorts/:id', requireAuth, async (req, res) => {
     const toEditCohort = await cohortRepository.findOne(req.params.id);
 
     // TODO: refactor: change name of validateCohort to editCohort
-    const editedCohort = validateCohort(toEditCohort, req.body);
+    const editedCohort = editCohort(toEditCohort, req.body);
 
     const updatedCohort = await cohortRepository.updateOne(toEditCohort, {
       $set: editedCohort,
@@ -269,7 +276,7 @@ module.exports = router;
 //          Edit Functions
 /*************************************** */
 
-function validateCohort(
+function editCohort(
   toEditCohort: Cohort,
   incoming: any,
 ): { name?: string; campus?: string; startDate?: Date; endDate?: Date } {
@@ -294,7 +301,7 @@ function validateCohort(
   return editedCohort;
 }
 
-function validateUser(
+function editUser(
   toEditUser: User,
   incoming: any,
 ): {

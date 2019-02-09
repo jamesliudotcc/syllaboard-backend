@@ -25,6 +25,13 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 //             Controllers
 /*************************************** */
 
+router.get('/', requireAuth, (req, res) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).send({ error: 'Not a student' });
+  }
+  return res.send({ user: req.user });
+});
+
 router.get('/deliverables', requireAuth, async (req, res) => {
   if (req.user.role !== 'student') {
     return res.status(403).send({ error: 'Not a student' });
@@ -32,7 +39,7 @@ router.get('/deliverables', requireAuth, async (req, res) => {
   try {
     //
     const student = await usersRepository.findOne(req.user._id);
-    
+
     const delivForEachStudent = student.deliverables.map(deliverable =>
       deliverableRepository.findOne(deliverable),
     );
