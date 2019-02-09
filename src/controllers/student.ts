@@ -2,11 +2,9 @@ import * as express from 'express';
 
 // TypeORM setup
 import { getMongoManager, getMongoRepository } from 'typeorm';
-import { Cohort } from '../entity/Cohort';
 import { Deliverable } from '../entity/Deliverable';
 import { User } from '../entity/User';
 
-const cohortRepository = getMongoRepository(Cohort);
 const deliverableRepository = getMongoRepository(Deliverable);
 const usersRepository = getMongoRepository(User);
 
@@ -90,7 +88,6 @@ function editDeliverable(deliverable: Deliverable, incoming: any): any {
     ? new Date(incoming.turnedIn)
     : null;
   if (incoming.deliverable) {
-    // console.log(incoming.deliverable);
     editedDeliverable.deliverable = incoming.deliverable;
   }
 
