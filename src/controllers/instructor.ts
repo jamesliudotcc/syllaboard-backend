@@ -88,8 +88,24 @@ router.delete('/assignments/:id', requireAuth, async (req, res) => {
 });
 
 // Instructor can send an assignment to cohort as deliverable
+router.get('/cohorts', requireAuth, async (req, res) => {
+  // TODO: change to instructor
+  // if (req.user.role !== 'admin') {
+  //   return res.status(403).send({ error: 'Not a student' });
+  // }
 
-router.post('/cohort/:id', requireAuth, async (req, res) => {
+  // See note from Parker. Like note from Sarah on admin.
+  try {
+    //
+    console.log('At the instructors cohorts POST route', req.user._id);
+    res.send('At the instructors cohort POST route');
+  } catch (error) {
+    console.log('Error with the instructor/cohorts/ POST route', error);
+    return res.send({ error: 'error' });
+  }
+});
+
+router.post('/cohorts/:id', requireAuth, async (req, res) => {
   // TODO: change to instructor
   // if (req.user.role !== 'admin') {
   //   return res.status(403).send({ error: 'Not a student' });
@@ -99,14 +115,12 @@ router.post('/cohort/:id', requireAuth, async (req, res) => {
     console.log('At the instructors cohorts POST route', req.user._id);
     res.send('At the instructors cohort POST route');
   } catch (error) {
-    console.log('Error with the instructor/cohort/ POST route', error);
+    console.log('Error with the instructor/cohorts/ POST route', error);
     return res.send({ error: 'error' });
   }
 });
 
-// And do all of the CRUD operations over them
-
-router.get('/cohort/:id', requireAuth, async (req, res) => {
+router.get('/cohorts/:id', requireAuth, async (req, res) => {
   // TODO: change to instructor
   // if (req.user.role !== 'admin') {
   //   return res.status(403).send({ error: 'Not a student' });
@@ -116,12 +130,12 @@ router.get('/cohort/:id', requireAuth, async (req, res) => {
     console.log('At the instructors cohorts POST route', req.user._id);
     res.send('At the instructors cohort POST route');
   } catch (error) {
-    console.log('Error with the instructor/cohort/ POST route', error);
+    console.log('Error with the instructor/cohorts/ POST route', error);
     return res.send({ error: 'error' });
   }
 });
 
-router.put('/cohort/:id', requireAuth, async (req, res) => {
+router.put('/cohorts/:id', requireAuth, async (req, res) => {
   // TODO: change to instructor
   // if (req.user.role !== 'admin') {
   //   return res.status(403).send({ error: 'Not a student' });
@@ -131,12 +145,12 @@ router.put('/cohort/:id', requireAuth, async (req, res) => {
     console.log('At the instructors cohorts PUT route', req.user._id);
     res.send('At the instructors cohort PUT route');
   } catch (error) {
-    console.log('Error with the instructor/cohort/ PUT route', error);
+    console.log('Error with the instructor/cohorts/ PUT route', error);
     return res.send({ error: 'error' });
   }
 });
 
-router.delete('/cohort/:id', requireAuth, async (req, res) => {
+router.delete('/cohorts/:id', requireAuth, async (req, res) => {
   // TODO: change to instructor
   // if (req.user.role !== 'admin') {
   //   return res.status(403).send({ error: 'Not a student' });
@@ -146,7 +160,7 @@ router.delete('/cohort/:id', requireAuth, async (req, res) => {
     console.log('At the instructors cohorts DELETE route', req.user._id);
     res.send('At the instructors cohort DELETE route');
   } catch (error) {
-    console.log('Error with the instructor/cohort/ DELETE route', error);
+    console.log('Error with the instructor/cohorts/ DELETE route', error);
     return res.send({ error: 'error' });
   }
 });

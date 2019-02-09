@@ -17,9 +17,9 @@ import { User } from './entity/User';
 
 createConnection({
   type: 'mongodb',
-  host: process.env.MONGODB_URI,
+  host: process.env.MONGODB_URL,
   port: Number(process.env.MONGODB_PORT),
-  database: process.env.MONGODB_DB_NAME,
+  database: 'test3',
   entities: [Assignment, Cohort, Deliverable, Topic, User],
   username: process.env.MONGODB_USERNAME,
   password: process.env.MONGODB_PASSWORD,
@@ -51,7 +51,6 @@ createConnection({
 
     app.use('/admin', require('./controllers/admin'));
     app.use('/auth', require('./controllers/auth'));
-    app.use('/cohort', require('./controllers/cohort'));
     app.use('/instructor', require('./controllers/instructor'));
     app.use('/student', require('./controllers/student'));
 

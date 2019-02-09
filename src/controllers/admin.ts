@@ -124,7 +124,8 @@ router.get('/cohorts', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not an admin' });
   }
   try {
-    const cohorts = await cohortRepository.find({});
+    const cohorts = await cohortRepository.find();
+
     return res.send({ cohorts });
   } catch (error) {
     console.log('Error with the admin/cohorts/ GET route', error);
@@ -156,6 +157,34 @@ router.post('/cohorts', requireAuth, async (req, res) => {
   } catch (error) {
     console.log('Error with admin/cohort/ POST route:', error);
     return res.status(503).send({ user: null });
+  }
+});
+
+router.get('/cohorts/:id', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
+  try {
+    const cohort = await cohortRepository.findOne(req.params.id);
+
+    const instructorsForCohort = cohort.instructors.map(instructor =>
+      usersRepository.findOne(instructor),
+    );
+    Promise.all(instructorsForCohort).then(instructors => {
+      const cohortWithInstructors = { ...cohort, instructors };
+
+      const studentsForCohort = cohort.students.map(student =>
+        usersRepository.findOne(student),
+      );
+      Promise.all(studentsForCohort).then(students => {
+        const cohortWithStudents = { ...cohortWithInstructors, students };
+
+        return res.send({ cohort: cohortWithStudents });
+      });
+    });
+  } catch (error) {
+    console.log('Error with the admin/cohorts/ GET route', error);
+    return res.send({ error: 'error' });
   }
 });
 

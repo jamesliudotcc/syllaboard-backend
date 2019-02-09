@@ -32,10 +32,11 @@ router.get('/deliverables', requireAuth, async (req, res) => {
   try {
     //
     const student = await usersRepository.findOne(req.user._id);
-    const promises = student.deliverables.map(deliverable =>
+    
+    const delivForEachStudent = student.deliverables.map(deliverable =>
       deliverableRepository.findOne(deliverable),
     );
-    Promise.all(promises).then(deliverables => {
+    Promise.all(delivForEachStudent).then(deliverables => {
       console.log(deliverables);
       return res.send({
         message: 'At the users deliverables GET route',
@@ -79,6 +80,10 @@ router.put('/deliverables/:id', requireAuth, async (req, res) => {
   }
 });
 module.exports = router;
+
+/*************************************** */
+//             Helper Functions
+/*************************************** */
 
 function editDeliverable(deliverable: Deliverable, incoming: any): any {
   const editedDeliverable = { ...deliverable };
