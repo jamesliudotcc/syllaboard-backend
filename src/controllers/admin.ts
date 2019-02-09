@@ -163,9 +163,10 @@ router.put('/cohorts/:id', requireAuth, async (req, res) => {
   }
   try {
     console.log('In the PUT /admin/cohort');
-
+    // TODO: refactor, change name of toEditCohort to cohort
     const toEditCohort = await cohortRepository.findOne(req.params.id);
 
+    // TODO: refactor: change name of validateCohort to editCohort
     const editedCohort = validateCohort(toEditCohort, req.body);
 
     const updatedCohort = await cohortRepository.updateOne(toEditCohort, {
@@ -234,7 +235,7 @@ router.put('/cohorts/instructors/:id', requireAuth, async (req, res) => {
 module.exports = router;
 
 /*************************************** */
-//          Validation Functions
+//          Edit Functions
 /*************************************** */
 
 function validateCohort(
