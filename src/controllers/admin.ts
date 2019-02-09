@@ -89,12 +89,12 @@ router.put('/users/:id', requireAuth, async (req, res) => {
 
     const editedUser = validateUser(toEditUser, req.body);
 
-    const updatedUser = await usersRepository.updateOne(toEditUser, {
+    await usersRepository.updateOne(toEditUser, {
       $set: editedUser,
     });
 
     res.send({
-      edited: updatedUser,
+      edited: editedUser,
     });
   } catch (error) {
     console.log('Error with admin/user/ PUT route:', error);
