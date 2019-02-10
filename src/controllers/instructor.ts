@@ -132,6 +132,8 @@ router.put('/assignments/:id', requireAuth, async (req, res) => {
 });
 
 router.delete('/assignments/:id', requireAuth, async (req, res) => {
+  // Nice to have, not implemented.
+
   if (req.user.role !== 'instructor') {
     return res.status(403).send({ error: 'Not a instructor' });
   }
@@ -159,11 +161,9 @@ router.get('/cohorts', requireAuth, async (req, res) => {
   }
 
   try {
-    console.log('At the instructors cohorts POST route', req.user._id);
     const cohorts = await cohortRepository.find({
       where: { instructors: req.user._id },
     });
-    // const cohorts = await cohortRepository.find();
 
     return res.send({ cohorts });
   } catch (error) {
@@ -179,7 +179,47 @@ router.post('/cohorts/:id', requireAuth, async (req, res) => {
   }
   try {
     console.log('At the instructors cohorts POST route', req.user._id);
-    res.send('At the instructors cohort POST route');
+
+    const instructor = await usersRepository.findOne(req.user._id);
+    const cohort = await cohortRepository.findOne(req.params.id);
+    const assignment = await assignmentRepository.findOne(
+      req.body.assignmentId,
+    );
+
+    cohort.students.forEach(async studentId => {
+      // For each id in cohort, pull a student
+      // Create a new Deliverable, copying assignment into new deliverable
+      const deliverable = new Deliverable();
+      deliverable.name = assignment.name;
+      deliverable.student.push(studentId);
+      deliverable.cohort.push(cohort._id);
+      deliverable.instructions = assignment.instructions;
+      deliverable.instructor.push(instructor._id);
+      deliverable.resourcesUrls = assignment.resourcesUrls;
+      deliverable.topics = assignment.topics;
+      deliverable.deadline = new Date(req.body.dueDate);
+
+      const freshDeliverable = await manager.save(deliverable);
+      const savedDeliverable = await deliverableRepository.findOne(
+        freshDeliverable,
+      );
+
+      // Save deliverable to student
+      const student = await usersRepository.findOne(studentId);
+
+      student.deliverables.push(savedDeliverable._id);
+      // console.log(student);
+      const savedStudent = await manager.save(student);
+      console.log(savedStudent);
+    });
+
+    res.send({
+      message: 'At the instructors cohort POST route',
+      instructor,
+      cohort,
+      assignment,
+      dueDate: new Date(req.body.dueDate),
+    });
   } catch (error) {
     console.log('Error with the instructor/cohorts/ POST route', error);
     return res.send({ error: 'error' });
@@ -217,6 +257,8 @@ router.get('/cohorts/:id', requireAuth, async (req, res) => {
 });
 
 router.put('/cohorts/:id', requireAuth, async (req, res) => {
+  // Nice to have, not implemented.
+
   if (req.user.role !== 'instructor') {
     return res.status(403).send({ error: 'Not an instructor' });
   }
@@ -231,6 +273,9 @@ router.put('/cohorts/:id', requireAuth, async (req, res) => {
 });
 
 router.delete('/cohorts/:id', requireAuth, async (req, res) => {
+  // This route removes a deliverable from a cohort
+  // Nice to have, not implemented.
+
   if (req.user.role !== 'instructor') {
     return res.status(403).send({ error: 'Not an instructor' });
   }
@@ -250,10 +295,8 @@ router.get('/deliverables', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not an instructor' });
   }
   try {
-    //
-
     const deliverables = await deliverableRepository.find({
-      // where: { instructors: req.user._id },
+      where: { instructors: req.user._id },
     });
 
     res.send({
@@ -271,12 +314,8 @@ router.get('/deliverables/:id', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not an instructor' });
   }
   try {
-    //
-
     const deliverable = await deliverableRepository.findOne(req.params.id);
-    console.log(deliverable.student);
     const student = await usersRepository.findOne(deliverable.student[0]);
-    console.log(student);
     res.send({
       message: 'At the instructors deliverables GET route',
       deliverable,
