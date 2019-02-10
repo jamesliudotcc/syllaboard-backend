@@ -78,8 +78,8 @@ router.put('/deliverables/:id', requireAuth, async (req, res) => {
 
     res.send({
       message: 'At the users deliverables/:id PUT route',
-      deliverable: editedDeliverable,
-      edited: updatedDeliverable,
+      editedDeliverable,
+      updatedDeliverable,
     });
   } catch (error) {
     console.log('Error with user/deliverable/ PUT route:', error);
@@ -95,7 +95,7 @@ module.exports = router;
 function editDeliverable(deliverable: Deliverable, incoming: any): any {
   const editedDeliverable = { ...deliverable };
   //
-  console.log('here', incoming);
+  console.log('Turning in deliverable', incoming);
   editedDeliverable.turnedIn = incoming.turnedIn
     ? new Date(incoming.turnedIn)
     : null;

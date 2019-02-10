@@ -153,13 +153,16 @@ router.delete('/assignments/:id', requireAuth, async (req, res) => {
 
 // Instructor can send an assignment to cohort as deliverable
 router.get('/cohorts', requireAuth, async (req, res) => {
+  // return res.status(403).send(req.user);
   if (req.user.role !== 'instructor') {
     return res.status(403).send({ error: 'Not a instructor' });
   }
 
   try {
     console.log('At the instructors cohorts POST route', req.user._id);
-    const cohorts = await cohortRepository.find({ instructors: req.user._id });
+    const cohorts = await cohortRepository.find({
+      where: { instructors: req.user._id },
+    });
     // const cohorts = await cohortRepository.find();
 
     return res.send({ cohorts });
@@ -175,8 +178,6 @@ router.post('/cohorts/:id', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not a instructor' });
   }
   try {
-    // See note from Parker. Like note from Sarah on admin.
-
     console.log('At the instructors cohorts POST route', req.user._id);
     res.send('At the instructors cohort POST route');
   } catch (error) {
@@ -250,8 +251,15 @@ router.get('/deliverables', requireAuth, async (req, res) => {
   }
   try {
     //
-    console.log('At the instructors deliverables GET route', req.user._id);
-    res.send('At the instructors deliverables GET route');
+
+    const deliverables = await deliverableRepository.find({
+      // where: { instructors: req.user._id },
+    });
+
+    res.send({
+      message: 'At the instructors deliverables GET route',
+      deliverables,
+    });
   } catch (error) {
     console.log('Error with the instructor/deliverables/ GET route', error);
     return res.send({ error: 'error' });
@@ -264,8 +272,16 @@ router.get('/deliverables/:id', requireAuth, async (req, res) => {
   }
   try {
     //
-    console.log('At the instructors deliverables GET route', req.user._id);
-    res.send('At the instructors deliverables GET route');
+
+    const deliverable = await deliverableRepository.findOne(req.params.id);
+    console.log(deliverable.student);
+    const student = await usersRepository.findOne(deliverable.student[0]);
+    console.log(student);
+    res.send({
+      message: 'At the instructors deliverables GET route',
+      deliverable,
+      student,
+    });
   } catch (error) {
     console.log('Error with the instructor/deliverables/ GET route', error);
     return res.send({ error: 'error' });
@@ -279,6 +295,22 @@ router.put('/deliverables/:id', requireAuth, async (req, res) => {
   try {
     //
     console.log('At the instructors deliverables/:id PUT route', req.user._id);
+
+    const deliverable = await deliverableRepository.findOne(req.params.id);
+
+    const editedDeliverable = editDeliverable(deliverable, req.body);
+
+    // Persist to database
+    const updatedDeliverable = await deliverableRepository.updateOne(
+      deliverable,
+      { $set: editedDeliverable },
+    );
+
+    res.send({
+      message: 'At the users deliverables/:id PUT route',
+      editedDeliverable,
+      updatedDeliverable,
+    });
     res.send('At the instructors deliverables/:id PUT route');
   } catch (error) {
     console.log('Error with instructor/deliverable/ PUT route:', error);
@@ -324,4 +356,17 @@ function editAssignment(
     editedAssignment.version = 1;
   }
   return editedAssignment;
+}
+
+function editDeliverable(deliverable: Deliverable, incoming: any): any {
+  const editedDeliverable = { ...deliverable };
+  //
+  console.log('Marking deliverable completed', incoming);
+  editedDeliverable.completed = incoming.completed
+    ? new Date(incoming.completed)
+    : null;
+  if (incoming.grade) {
+    editedDeliverable.grade = incoming.grade;
+  }
+  return editedDeliverable;
 }

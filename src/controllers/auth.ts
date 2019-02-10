@@ -66,8 +66,8 @@ router.post('/signup', async (req, res) => {
   try {
     // If user exists, don't let them create a duplicate
     const user = await userRepository.findOne({ email: newUserData.email });
-    console.log('Existing User:', user.firstName);
     if (user) {
+      console.log('Existing User:', user.firstName);
       return res.status(409).send('User already exists');
     }
 
