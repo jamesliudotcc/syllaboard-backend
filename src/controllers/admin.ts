@@ -96,12 +96,12 @@ router.put('/users/:id', requireAuth, async (req, res) => {
 
     const editedUser = editUser(toEditUser, req.body);
 
-    const updatedUser = await usersRepository.updateOne(toEditUser, {
+    await usersRepository.updateOne(toEditUser, {
       $set: editedUser,
     });
 
     res.send({
-      edited: updatedUser,
+      edited: editedUser,
     });
   } catch (error) {
     console.log('Error with admin/user/ PUT route:', error);
@@ -207,12 +207,12 @@ router.put('/cohorts/:id', requireAuth, async (req, res) => {
     // TODO: refactor: change name of validateCohort to editCohort
     const editedCohort = editCohort(toEditCohort, req.body);
 
-    const updatedCohort = await cohortRepository.updateOne(toEditCohort, {
+    await cohortRepository.updateOne(toEditCohort, {
       $set: editedCohort,
     });
 
     res.send({
-      edited: updatedCohort,
+      edited: editedCohort,
     });
   } catch (error) {
     console.log('Error with admin/cohort/ POST route:', error);
