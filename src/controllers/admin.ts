@@ -1,4 +1,8 @@
+import { config as configureDotenv } from 'dotenv';
 import * as express from 'express';
+import * as Mailgun from 'mailgun-js';
+
+configureDotenv();
 
 // TypeORM setup
 import { getMongoManager, getMongoRepository } from 'typeorm';
@@ -145,7 +149,6 @@ router.post('/cohorts', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not an admin' });
   }
   console.log('In the POST /admin/cohort');
-  console.log(req.body);
 
   try {
     console.log(req.body);
@@ -195,6 +198,28 @@ router.get('/cohorts/:id', requireAuth, async (req, res) => {
   }
 });
 
+router.post('/cohorts/:id', requireAuth, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).send({ error: 'Not an admin' });
+  }
+  try {
+    const cohort = await cohortRepository.findOne(req.params.id);
+
+    if (!cohort.studentKey) {
+      console.log(`no student key for ${cohort.name} cohort`);
+      throw new Error(`no student key for ${cohort.name} cohort`);
+    }
+
+    const emailResponse = await sendEmail({
+      email: req.body.email,
+      cohortKey: cohort.studentKey,
+    });
+    res.send(emailResponse);
+  } catch (error) {
+    console.log('Error with admin/cohort/ POST route:', error);
+    return res.status(503).send({ user: null });
+  }
+});
 router.put('/cohorts/:id', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
@@ -325,4 +350,35 @@ function editUser(
     editedUser.role = incoming.role;
   }
   return editedUser;
+}
+
+/*************************************** */
+//          Send email
+/*************************************** */
+
+async function sendEmail(emailInfo: { email: string; cohortKey: string }) {
+  const apiKey = process.env.MAILGUN_KEY;
+  const domain = process.env.MAILGUN_DOMAIN;
+
+  const mailgun = new Mailgun({ apiKey, domain });
+
+  const fromWho = 'Syllaboard Robot<robot@jamesliu.cc>';
+  const cohortKey = emailInfo.cohortKey;
+  const userEmail = emailInfo.email;
+  const link = `http://syllaboard.herokuapp.com/signin/${cohortKey}/`;
+
+  const email = {
+    from: fromWho,
+    to: userEmail,
+    subject: 'Welcome to Syllaboard',
+    html: `You have been invited to Syllabard, General Assembly's assignment tracking service. Click <a href="${link}">here</a> to sign up.`,
+  };
+
+  try {
+    const mailGunResponse = await mailgun.messages().send(email);
+    return mailGunResponse;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 }

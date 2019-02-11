@@ -10,7 +10,7 @@ Typescript is not particularly well supported in MongoDB land. One project calle
 
 ## Models
 
-Typeorm allows schemas to be defined very declaratively. We defined the following schemas:
+We defined the following schemas:
 
 #### Schemas
 
@@ -46,7 +46,7 @@ Typeorm allows schemas to be defined very declaratively. We defined the followin
 | password  | String   |
 | role      | String   |
 
-Notice that the code for the entities (models) are not so different. We made a list of what data should be in the database, and in what format, and that is all there is.
+Notice that the code for the entities (models) are not so different. We made a list of what data should be in the database, and in what format, and that is all there is. Typeorm allows schemas to be defined very declaratively: say what data to persist, add a decorator to  The models just do data persistence. All of the back-end logic 
 
 
 
