@@ -296,7 +296,7 @@ router.get('/deliverables', requireAuth, async (req, res) => {
   }
   try {
     const deliverables = await deliverableRepository.find({
-      where: { instructors: req.user._id },
+      where: { instructor: req.user._id },
     });
 
     res.send({
