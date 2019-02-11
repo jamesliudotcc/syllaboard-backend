@@ -1,39 +1,41 @@
 # Syllaboard Backend
 
-## Usability considerations
+Since this is a decoupled MERN app, the backend has one basic job, data persistence in the database. The database is MongoDB. After discussing the problem domain, we concluded that the data would be better modeled in a relational database, but that we are in the Mongo unit, so we decided to just use Mongo anyway.
 
-One aspect of usability that we considered, but decided not to implement, regards legacy browsers and slow internet connections. However, consider our target audience: coding school instructors, administrators, and students. The schools are located in metropolitan areas where fast internet is readily available, and any remote students require fast internet connections to be able to consume the course content. Administrators and instructors will often be working at school facilities on recent hardware with good Wifi. Even our larger JSON data payloads are not particularly big: so far it is mostliy assignment metadata.
+## Technology choices
 
-We did design for mobile first.
+Since we decided to use Typescript and Redux on the front end, we decided to use Typescript on the backend as well. That way, we could be fairly certain that the data being passed back and forth have a consistent structure.
 
-## Things to add
+Typescript is not particularly well supported in MongoDB land. One project called Typegoose translates from types to Mongoose schemas. There is a library called Typeswan, which purports to be Typegoose, but better. Instead, we chose to use Typeorm, which has Mongo support because one team member has experience with it as a ORM for SQL databases.
 
-Turn the .env.example into a .env. The random looking strings are random nonsense we pulled from a [random string generator service](https://www.grc.com/passwords.htm). They are different from what we are using for the project. .env.example is an example. You should generate similarly long random strings!
+## Models
 
-## Schemas
+Typeorm allows schemas to be defined very declaratively. We defined the following schemas:
 
-| Assignment    | type     |
-| ------------- | -------- |
-| \_id          | ObjectId |
-| student       | ObjectID |
-| instructor    | ObjectID |
-| instructions  | String   |
-| resourcesUrls | String[] |
-| deadline      | Date     |
-| turnedIn      | Date     |
-| completed     | Date     |
-| deliverable   | String   |
-| number        | String   |
+#### Schemas
 
-| Cohort      | type       |
-| ----------- | ---------- |
-| \_id        | ObjectId   |
-| name        | String     |
-| campus      | String     |
-| students    | ObjectID[] |
-| instructors | ObjectID[] |
-| startDate   | Date       |
-| endDate     | Date       |
+| Assignment    | type                        |
+| ------------- | --------------------------- |
+| \_id          | ObjectID                    |
+| student       | Student's ID (reference)    |
+| instructor    | Instructor's ID (reference) |
+| instructions  | String                      |
+| resourcesUrls | Array of strings            |
+| deadline      | Date                        |
+| turnedIn      | Date                        |
+| completed     | Date                        |
+| deliverable   | String                      |
+| number        | String                      |
+
+| Cohort      | type                        |
+| ----------- | --------------------------- |
+| \_id        | ObjectId                    |
+| name        | String                      |
+| campus      | String                      |
+| students    | Student's ID (reference)    |
+| instructors | Instructor's ID (reference) |
+| startDate   | Date                        |
+| endDate     | Date                        |
 
 | User      | type     |
 | --------- | -------- |
@@ -43,6 +45,33 @@ Turn the .env.example into a .env. The random looking strings are random nonsens
 | email     | String   |
 | password  | String   |
 | role      | String   |
+
+Notice that the code for the entities (models) are not so different. We made a list of what data should be in the database, and in what format, and that is all there is.
+
+
+
+## Controllers
+
+## Usability considerations
+
+One aspect of usability that we considered, but decided not to implement, regards legacy browsers and slow internet connections. However, consider our target audience: coding school instructors, administrators, and students. The schools are located in metropolitan areas where fast internet is readily available, and any remote students require fast internet connections to be able to consume the course content. Administrators and instructors will often be working at school facilities on recent hardware with good WiFi. Even our larger JSON data payloads are not particularly big: so far it is mostly assignment metadata.
+
+We did design for mobile first.
+
+## Things to add
+
+Turn the .env.example into a .env. The random looking strings are random nonsense we pulled from a [random string generator service](https://www.grc.com/passwords.htm). They are different from what we are using for the project. .env.example is an example. You should generate similarly long random strings!
+
+## 
+
+|      |      |
+| ---- | ---- |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
+|      |      |
 
 ## Routes
 

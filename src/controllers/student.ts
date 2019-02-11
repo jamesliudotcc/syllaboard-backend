@@ -67,9 +67,11 @@ router.put('/deliverables/:id', requireAuth, async (req, res) => {
     //
     const deliverable = await deliverableRepository.findOne(req.params.id);
 
-    const editedDeliverable = editDeliverable(deliverable, req.body);
-    console.log('At the users deliverables/:id PUT route', req.user._id);
-
+    const editedDeliverable = {
+      ...deliverable,
+      deliverable: req.body.deliverable,
+      turnedIn: new Date(),
+    };
     // Persist to database
     const updatedDeliverable = await deliverableRepository.updateOne(
       deliverable,
@@ -87,21 +89,3 @@ router.put('/deliverables/:id', requireAuth, async (req, res) => {
   }
 });
 module.exports = router;
-
-/*************************************** */
-//             Helper Functions
-/*************************************** */
-
-function editDeliverable(deliverable: Deliverable, incoming: any): any {
-  const editedDeliverable = { ...deliverable };
-  //
-  console.log('Turning in deliverable', incoming);
-  editedDeliverable.turnedIn = incoming.turnedIn
-    ? new Date(incoming.turnedIn)
-    : null;
-  if (incoming.deliverable) {
-    editedDeliverable.deliverable = incoming.deliverable;
-  }
-
-  return editedDeliverable;
-}

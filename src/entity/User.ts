@@ -6,7 +6,6 @@ import {
   ObjectID,
   ObjectIdColumn,
 } from 'typeorm';
-import { Deliverable } from './Deliverable';
 
 @Entity()
 export class User {
