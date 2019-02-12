@@ -51,10 +51,8 @@ createConnection({
 
     app.use('/auth', require('./controllers/auth'));
 
-    app.use('/admin', require('./controllers/admin'));
     app.use('/admin/cohorts', require('./controllers/admin/cohorts'));
     app.use('/admin/users', require('./controllers/admin/users'));
-    app.use('/instructor', require('./controllers/instructor'));
     app.use(
       '/instructor/assignments',
       require('./controllers/instructor/assignments'),

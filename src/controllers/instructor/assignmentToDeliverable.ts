@@ -1,11 +1,14 @@
+import { getMongoManager, getMongoRepository } from 'typeorm';
+import { Assignment } from '../../entity/Assignment';
+import { Cohort } from '../../entity/Cohort';
 import { Deliverable } from '../../entity/Deliverable';
-import {
-  assignmentRepository,
-  cohortRepository,
-  deliverableRepository,
-  manager,
-  usersRepository,
-} from '../instructor';
+import { User } from '../../entity/User';
+
+const assignmentRepository = getMongoRepository(Assignment);
+const cohortRepository = getMongoRepository(Cohort);
+const deliverableRepository = getMongoRepository(Deliverable);
+const usersRepository = getMongoRepository(User);
+const manager = getMongoManager();
 
 export async function assignmentToDeliverable(req) {
   const instructor = await usersRepository.findOne(req.user._id);

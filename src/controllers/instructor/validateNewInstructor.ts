@@ -1,5 +1,9 @@
+import { getMongoManager, getMongoRepository } from 'typeorm';
 import { Assignment } from '../../entity/Assignment';
-import { assignmentRepository, manager } from '../instructor';
+
+const assignmentRepository = getMongoRepository(Assignment);
+const manager = getMongoManager();
+
 export async function validateNewInstructor(incoming: any) {
   const assignment = new Assignment();
   if (incoming.cohortType) {
