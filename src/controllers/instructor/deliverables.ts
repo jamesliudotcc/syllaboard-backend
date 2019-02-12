@@ -31,199 +31,7 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 
 // Assignments: Instructor can CRUD assignments to turn into deliverables
 
-router.get('/', requireAuth, (req, res) => {
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not a instructor' });
-  }
-  return res.send({ user: req.user });
-});
-
-router.post('/assignments', requireAuth, async (req, res) => {
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not a instructor' });
-  }
-  try {
-    const incoming = req.body;
-    incoming.instructor = req.user._id;
-
-    const mintedAssignment = await validateNewInstructor(incoming);
-
-    res.send({
-      message: 'At the instructors assignments POST route',
-      assignment: mintedAssignment,
-      incoming,
-    });
-  } catch (error) {
-    console.log('Error with the instructor/assignments/ POST route', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.get('/assignments', requireAuth, async (req, res) => {
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not a instructor' });
-  }
-  try {
-    const assignments = await assignmentRepository.find();
-    res.send({ assignments });
-  } catch (error) {
-    console.log('Error with the instructor/assignments/ GET route', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.put('/assignments/:id', requireAuth, async (req, res) => {
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not a instructor' });
-  }
-  try {
-    const toEditAssignment = await assignmentRepository.findOne(req.params.id);
-
-    const editedAssignment = editAssignment(toEditAssignment, req.body);
-
-    const updatedAssignment = await assignmentRepository.updateOne(
-      toEditAssignment,
-      {
-        $set: editedAssignment,
-      },
-    );
-
-    return res.send({
-      edited: updatedAssignment,
-    });
-  } catch (error) {
-    console.log('Error with the instructor/assignments/ PUT route', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.delete('/assignments/:id', requireAuth, async (req, res) => {
-  // Nice to have, not implemented.
-
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not a instructor' });
-  }
-  try {
-    console.log(`DELETE assignment ${req.params.id}`);
-    // TODO: Should any teacher be able to delete an assignment?
-
-    const assignment = await assignmentRepository.findOne(req.params.id);
-    const deletedAssignment = await assignmentRepository.findOneAndDelete(
-      assignment,
-    );
-
-    return res.send({ deleted: deletedAssignment });
-  } catch (error) {
-    console.log('Error with the instructor/assignments/ DELETE route', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-// Instructor can send an assignment to cohort as deliverable
-router.get('/cohorts', requireAuth, async (req, res) => {
-  // return res.status(403).send(req.user);
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not a instructor' });
-  }
-
-  try {
-    const cohorts = await cohortRepository.find({
-      where: { instructors: req.user._id },
-    });
-
-    return res.send({ cohorts });
-  } catch (error) {
-    console.log('Error with the instructor/cohorts/ POST route', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.post('/cohorts/:id', requireAuth, async (req, res) => {
-  //
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not a instructor' });
-  }
-  try {
-    const { instructor, cohort, assignment } = await assignmentToDeliverable(
-      req,
-    );
-
-    res.send({
-      message: 'At the instructors cohort POST route',
-      instructor,
-      cohort,
-      assignment,
-      dueDate: new Date(req.body.dueDate),
-    });
-  } catch (error) {
-    console.log('Error with the instructor/cohorts/ POST route', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.get('/cohorts/:id', requireAuth, async (req, res) => {
-  //
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not an instructor' });
-  }
-  try {
-    console.log('At the instructors cohorts/:id GET route', req.user._id);
-    const cohort = await cohortRepository.findOne(req.params.id);
-
-    const instructorsForCohort = cohort.instructors.map(instructor =>
-      usersRepository.findOne(instructor),
-    );
-    Promise.all(instructorsForCohort).then(instructors => {
-      const cohortWithInstructors = { ...cohort, instructors };
-
-      const studentsForCohort = cohort.students.map(student =>
-        usersRepository.findOne(student),
-      );
-      Promise.all(studentsForCohort).then(students => {
-        const cohortWithStudents = { ...cohortWithInstructors, students };
-
-        return res.send({ cohort: cohortWithStudents });
-      });
-    });
-  } catch (error) {
-    console.log('Error with the instructor/cohorts/:id GET route', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.put('/cohorts/:id', requireAuth, async (req, res) => {
-  // Nice to have, not implemented.
-
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not an instructor' });
-  }
-  try {
-    //
-    console.log('At the instructors cohorts PUT route', req.user._id);
-    res.send('At the instructors cohort PUT route');
-  } catch (error) {
-    console.log('Error with the instructor/cohorts/ PUT route', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.delete('/cohorts/:id', requireAuth, async (req, res) => {
-  // This route removes a deliverable from a cohort
-  // Nice to have, not implemented.
-
-  if (req.user.role !== 'instructor') {
-    return res.status(403).send({ error: 'Not an instructor' });
-  }
-  try {
-    res.send('At the instructors cohort DELETE route');
-  } catch (error) {
-    console.log('Error with the instructor/cohorts/ DELETE route', error);
-    return res.send({ error: 'error' });
-  }
-});
-// Instructor can see what were turned in and grade them.
-
-router.get('/deliverables', requireAuth, async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   if (req.user.role !== 'instructor') {
     return res.status(403).send({ error: 'Not an instructor' });
   }
@@ -242,7 +50,7 @@ router.get('/deliverables', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/deliverables/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, async (req, res) => {
   if (req.user.role !== 'instructor') {
     return res.status(403).send({ error: 'Not an instructor' });
   }
@@ -260,7 +68,7 @@ router.get('/deliverables/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/deliverables/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   if (req.user.role !== 'instructor') {
     return res.status(403).send({ error: 'Not an instructor' });
   }
