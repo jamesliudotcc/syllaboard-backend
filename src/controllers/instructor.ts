@@ -21,6 +21,7 @@ const router = express.Router();
 // tslint:disable-next-line:no-var-requires
 const passportService = require('../services/passport');
 import passport = require('passport');
+import { editAssignment, editDeliverable } from './instructorEdits';
 
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
@@ -358,55 +359,3 @@ router.put('/deliverables/:id', requireAuth, async (req, res) => {
   }
 });
 module.exports = router;
-
-/*************************************** */
-//          Edit Functions
-/*************************************** */
-
-function editAssignment(
-  toEditAssignmeent: Assignment,
-  incoming: any,
-): Assignment {
-  const editedAssignment = { ...toEditAssignmeent };
-
-  if (incoming.firstName) {
-    editedAssignment.cohortType = incoming.cohortType;
-  }
-  if (incoming.lastName) {
-    editedAssignment.cohortWeek = incoming.cohortWeek;
-  }
-  if (incoming.instructions) {
-    editedAssignment.instructions = incoming.instructions;
-  }
-  if (incoming.instructor) {
-    editedAssignment.instructor = incoming.instructor;
-  }
-  if (incoming.name) {
-    editedAssignment.name = incoming.name;
-  }
-  if (incoming.resourcesUrls) {
-    editedAssignment.resourcesUrls = incoming.resourcesUrls;
-  }
-  if (incoming.topics) {
-    editedAssignment.topics = incoming.topics;
-  }
-  if (incoming.version) {
-    editedAssignment.version++;
-  } else {
-    editedAssignment.version = 1;
-  }
-  return editedAssignment;
-}
-
-function editDeliverable(deliverable: Deliverable, incoming: any): any {
-  const editedDeliverable = { ...deliverable };
-  //
-  console.log('Marking deliverable completed', incoming);
-  editedDeliverable.completed = incoming.completed
-    ? new Date(incoming.completed)
-    : null;
-  if (incoming.grade) {
-    editedDeliverable.grade = incoming.grade;
-  }
-  return editedDeliverable;
-}

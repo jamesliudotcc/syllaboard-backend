@@ -1,6 +1,5 @@
 import { config as configureDotenv } from 'dotenv';
 import * as express from 'express';
-import * as Mailgun from 'mailgun-js';
 
 configureDotenv();
 
@@ -21,6 +20,8 @@ const router = express.Router();
 // tslint:disable-next-line:no-var-requires
 const passportService = require('../services/passport');
 import passport = require('passport');
+import { editUser, editCohort } from './adminEdits';
+import { sendEmail } from './sendEmail';
 
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
@@ -297,88 +298,4 @@ router.put('/cohorts/instructors/:id', requireAuth, async (req, res) => {
 
 module.exports = router;
 
-/*************************************** */
-//          Edit Functions
-/*************************************** */
 
-function editCohort(
-  toEditCohort: Cohort,
-  incoming: any,
-): { name?: string; campus?: string; startDate?: Date; endDate?: Date } {
-  const editedCohort = { ...toEditCohort };
-
-  if (incoming.name) {
-    editedCohort.name = incoming.name;
-  }
-
-  if (incoming.campus) {
-    editedCohort.campus = incoming.campus;
-  }
-
-  editedCohort.startDate = incoming.startDate
-    ? new Date(incoming.startDate)
-    : new Date(toEditCohort.startDate);
-
-  editedCohort.endDate = incoming.endDate
-    ? new Date(incoming.endDate)
-    : new Date(toEditCohort.endDate);
-
-  return editedCohort;
-}
-
-function editUser(
-  toEditUser: User,
-  incoming: any,
-): {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  role?: 'admin' | 'instructor' | 'student';
-} {
-  const editedUser = { ...toEditUser };
-
-  if (incoming.firstName) {
-    editedUser.firstName = incoming.firstName;
-  }
-  if (incoming.lastName) {
-    editedUser.lastName = incoming.lastName;
-  }
-  if (incoming.email) {
-    editedUser.email = incoming.email;
-  }
-  if (incoming.role) {
-    editedUser.role = incoming.role;
-  }
-  return editedUser;
-}
-
-/*************************************** */
-//          Send email
-/*************************************** */
-
-async function sendEmail(emailInfo: { email: string; cohortKey: string }) {
-  const apiKey = process.env.MAILGUN_KEY;
-  const domain = process.env.MAILGUN_DOMAIN;
-
-  const mailgun = new Mailgun({ apiKey, domain });
-
-  const fromWho = 'Syllaboard Robot<robot@jamesliu.cc>';
-  const cohortKey = emailInfo.cohortKey;
-  const userEmail = emailInfo.email;
-  const link = `http://syllaboard.herokuapp.com/signin/${cohortKey}/`;
-
-  const email = {
-    from: fromWho,
-    to: userEmail,
-    subject: 'Welcome to Syllaboard',
-    html: `You have been invited to Syllabard, General Assembly's assignment tracking service. Click <a href="${link}">here</a> to sign up.`,
-  };
-
-  try {
-    const mailGunResponse = await mailgun.messages().send(email);
-    return mailGunResponse;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-}
