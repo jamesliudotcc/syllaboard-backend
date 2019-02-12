@@ -44,7 +44,7 @@ router.post('/assignments', requireAuth, async (req, res) => {
   }
   try {
     const incoming = req.body;
-    incoming.instructor = req.user._id
+    incoming.instructor = req.user._id;
 
     const assignment = new Assignment();
 

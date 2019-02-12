@@ -17,15 +17,27 @@ We defined the following schemas:
 | Assignment    | type                        |
 | ------------- | --------------------------- |
 | \_id          | ObjectID                    |
-| student       | Student's ID (reference)    |
+| Name          | String                      |
+| Version       | Number                      |
 | instructor    | Instructor's ID (reference) |
 | instructions  | String                      |
 | resourcesUrls | Array of strings            |
+| cohotTYpe     | Array of strings            |
+| cohorrtWeek   | String                      |
+
+| Deliverable   | type                        |
+| ------------- | --------------------------- |
+| \_id          | ObjectID                    |
+| instructor    | Instructor's ID (reference) |
+| student       | Student's ID (reference)    |
+| cohort        | Cohort's ID (reference)     |
+| instructions  | String                      |
+| resourcesUrls | Array of strings            |
 | deadline      | Date                        |
+| deliverable   | String                      |
 | turnedIn      | Date                        |
 | completed     | Date                        |
-| deliverable   | String                      |
-| number        | String                      |
+| grade         | Number                      |
 
 | Cohort      | type                        |
 | ----------- | --------------------------- |
@@ -46,11 +58,49 @@ We defined the following schemas:
 | password  | String   |
 | role      | String   |
 
-Notice that the code for the entities (models) are not so different. We made a list of what data should be in the database, and in what format, and that is all there is. Typeorm allows schemas to be defined very declaratively: say what data to persist, add a decorator to  The models just do data persistence. All of the back-end logic 
+Notice that the code for the entities (models) are not so different from the descritpions. We made a list of what data should be in the database, and in what format, and that is all there is. Typeorm allows schemas to be defined very declaratively: say what data to persist, what type, and add a decorator to turn the type into a column.
 
-
+We went back and forth on embedding deliverables within student. There was also some consideration of embedding student within deliverable, but in the end we decided to keep separate collections. The one-to-many relationship for deliverables and students suggested embedding, but it became difficult to reach in from the instrutor's side to see all deliverables that matched certain criteria, and to edit them.
 
 ## Controllers
+
+The controllers are where most of the backend app logic lives. The initial development took place in a couple of example files, populateDB and assignmentExample. The assignment flow is where the heart of the application logic. An instructor has access to assignments, which are descriptions of what should be accomplished as homeworks. They can be assigned to a cohort as a deliverable, so that each member of the cohort has an individual deliverable. Once the deliverable is completed, it is turned in with a URL to the work product (for example, a github repo, a Google Doc, a PDF hosted on Dropbox, whatever). When it is turned in, it is timestamped as completed. The instructor can then mark them as completed, and if the assignment should be graded, with a grade.
+
+Once that logic could be persisted in the database, the routes mostly wrote themselves. Well, we still had to write them and test them but it was just a matter of getting JSON in, JSON out, and making sure the correct type of user had access to the routes.
+
+#### API Routes
+
+| Routes                         | REST Verb | Description                                               |
+| ------------------------------ | --------- | --------------------------------------------------------- |
+| **Instructor Routes**          |           |                                                           |
+| /instructor/assignments        | POST      | Create assignment                                         |
+| /instructor/assignments        | GET       |                                                           |
+| /instructor/assignments/:id    | PUT       | Edit assignment                                           |
+| /instructor/assignments/:id    | DELETE    | Delete assignment (not implemented)                       |
+| /instructor/cohorts/           | GET       | Get a list of all cohorts                                 |
+| /instructor/cohort/:id         | POST      | Assign deliverable to cohort                              |
+| /instructor/cohort/:id         | GET       | Summary of cohort progress on deliverable                 |
+| /instructor/cohort/:id         | PUT       | Edit all of a deliverable on a cohort                     |
+| /instructor/cohort/:id         | DELETE    | Delete all of a deliverable on a cohort (Not implemented) |
+| /instructor/deliverable/:id    | GET       | Get info for a particular deliverable                     |
+| /instructor/deliverable/:id    | PUT       | Set grade to a deliverable                                |
+| (wishlist)                     | POST      | Bulk grade deliverables                                   |
+| **Admin Routes**               |           |                                                           |
+| /admin/users                   | POST ??   | Create user                                               |
+| /admin/users                   | GET       | Show all users {filter}                                   |
+| /admin/users/:id               | GET       | Show particular user                                      |
+| /admin/users/:id               | PUT       | Edit a user                                               |
+| /admin/users/:id               | DELETE    | Delete a user                                             |
+| /admin/cohorts                 | POST      | Create a cohort                                           |
+| /admin/cohorts                 | GET       | Show chorts, filter by ...                                |
+| /admin/cohorts/:id             | PUT       | Edit a cohort                                             |
+| /admin/cohorts/:id             | DELETE    | Delete a cohort                                           |
+| /admin/cohorts/instructors/:id | PUT       | Add an instructor to a cohort                             |
+| **User Routes**                |           |                                                           |
+| /user/:id                      | GET       | User info                                                 |
+| /user/deliverable/             | GET       | Gets all deliverables                                     |
+| /user/deliverable/:id          | PUT       | Update deliverable                                        |
+| /user/deliverable/pending      | GET       | Sends pending deliverables (wishlist)                     |
 
 ## Usability considerations
 
@@ -58,62 +108,11 @@ One aspect of usability that we considered, but decided not to implement, regard
 
 We did design for mobile first.
 
-## Things to add
+## App secrets
 
-Turn the .env.example into a .env. The random looking strings are random nonsense we pulled from a [random string generator service](https://www.grc.com/passwords.htm). They are different from what we are using for the project. .env.example is an example. You should generate similarly long random strings!
+Turn the .env.example into a .env. The random looking string for the JWT secret is random nonsense we pulled from a [random string generator service](https://www.grc.com/passwords.htm). We never used that particular string for the project. .env.example is an example. You should generate similarly long random strings!
 
-## 
+## Nice to have
 
-|      |      |
-| ---- | ---- |
-|      |      |
-|      |      |
-|      |      |
-|      |      |
-|      |      |
-|      |      |
-
-## Routes
-
-| Route               | REST Verb | Description                          |
-| ------------------- | --------- | ------------------------------------ |
-| /                   | GET       | Landing page, has login and signup   |
-| /auth/signup        | POST      | Collects signup info                 |
-| /auth/login         | POST      | Collects login info                  |
-| /admin              | GET       | Main admin                           |
-| /instructor         | GET       | Main Instructor                      |
-| /instructor/cohort/ |           |                                      |
-| /student            | GET       | Main student dashboard               |
-| /student/turnin     | GET       | Shows form for turn in of assignment |
-| /student/turnin     | POST      |                                      |
-
-## API Routes
-
-| Routes                      | REST Verb | Description                               |
-| --------------------------- | --------- | ----------------------------------------- |
-| **Instructor Routes**       |           |                                           |
-| /instructor/assignments     | POST      | Create assignment                         |
-| /instructor/assignments     | GET       |                                           |
-| /instructor/assignments/:id | PUT       | Edit assignment                           |
-| /instructor/assignments/:id | DELETE    | Delete assignment                         |
-| /instructor/cohort/:id      | POST      | Assign deliverable to cohort              |
-| /instructor/cohort/:id      | GET       | Summary of cohort progress on deliverable |
-| /instructor/cohort/:id      | PUT       | Edit all of a deliverable on a cohort     |
-| /instructor/cohort/:id      | DELETE    | Delete all of a deliverable on a cohort   |
-| /instructor/deliverable/:id | PUT       | Set grade to a deliverable                |
-| (wishlist)                  | POST      | Bulk grade deliverables                   |
-| **Admin Routes**            |           |                                           |
-| /admin/users                | POST ??   | Create user                               |
-| /admin/users                | GET       | Show all users {filter} 1                 |
-| /admin/users/:id            | GET       | Show particular user                      |
-| /admin/users/:id            | PUT       | Edit a user 6                             |
-| /admin/users/:id            | DELETE    | Delete a user 3                           |
-| /admin/cohort               | POST      | Create a cohort 7                         |
-| /admin/cohort               | GET       | Show chorts, filter by ... 2              |
-| /admin/cohort/:id           | PUT       | Edit a cohort 5                           |
-| /admin/cohort/:id           | DELETE    | Delete a cohort 4                         |
-| **User Routes**             |           |                                           |
-| /user/:id                   | GET       | User info                                 |
-| /user/deliverable/          | GET       | Gets all deliverables                     |
-| /user/deliverable/:id       | PUT       | Update deliverable                        |
-| /user/deliverable/pending   | GET       | Sends pending deliverables (wishlist)     |
+There are some routes that were not implemented because they are not required for MVP that we should implement.
+In addition, the authorization for each type of user should be refactored into middlewares. Also, while writing the mock data generation, it would have been good to write tests alongside. The mocks and testing serve the same purpose and accomplish the same goals: make sure that the app logic does what it should do.
