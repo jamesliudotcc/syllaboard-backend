@@ -1,9 +1,10 @@
 import { Assignment } from '../entity/Assignment';
 import { Deliverable } from '../entity/Deliverable';
-/*************************************** */
-//          Edit Functions
-/*************************************** */
-export function editAssignment(toEditAssignmeent: Assignment, incoming: any): Assignment {
+
+export function editAssignment(
+  toEditAssignmeent: Assignment,
+  incoming: any,
+): Assignment {
   const editedAssignment = { ...toEditAssignmeent };
   if (incoming.firstName) {
     editedAssignment.cohortType = incoming.cohortType;
@@ -28,8 +29,7 @@ export function editAssignment(toEditAssignmeent: Assignment, incoming: any): As
   }
   if (incoming.version) {
     editedAssignment.version++;
-  }
-  else {
+  } else {
     editedAssignment.version = 1;
   }
   return editedAssignment;

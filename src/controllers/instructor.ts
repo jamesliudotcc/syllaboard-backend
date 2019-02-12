@@ -7,12 +7,12 @@ import { Cohort } from '../entity/Cohort';
 import { Deliverable } from '../entity/Deliverable';
 import { User } from '../entity/User';
 
-const assignmentRepository = getMongoRepository(Assignment);
-const cohortRepository = getMongoRepository(Cohort);
-const deliverableRepository = getMongoRepository(Deliverable);
-const usersRepository = getMongoRepository(User);
+export const assignmentRepository = getMongoRepository(Assignment);
+export const cohortRepository = getMongoRepository(Cohort);
+export const deliverableRepository = getMongoRepository(Deliverable);
+export const usersRepository = getMongoRepository(User);
 
-const manager = getMongoManager();
+export const manager = getMongoManager();
 
 // Express setup
 const router = express.Router();
@@ -21,7 +21,10 @@ const router = express.Router();
 // tslint:disable-next-line:no-var-requires
 const passportService = require('../services/passport');
 import passport = require('passport');
+
+import { assignmentToDeliverable } from './assignmentToDeliverable';
 import { editAssignment, editDeliverable } from './instructorEdits';
+import { validateNewInstructor } from './validateNewInstructor';
 
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
@@ -47,36 +50,7 @@ router.post('/assignments', requireAuth, async (req, res) => {
     const incoming = req.body;
     incoming.instructor = req.user._id;
 
-    const assignment = new Assignment();
-
-    if (incoming.cohortType) {
-      assignment.cohortType = incoming.cohortType;
-    }
-    if (incoming.cohortWeek) {
-      assignment.cohortWeek = incoming.cohortWeek;
-    }
-    if (incoming.instructions) {
-      assignment.instructions = incoming.instructions;
-    }
-    if (incoming.instructor) {
-      assignment.instructor = incoming.instructor;
-    }
-    if (incoming.name) {
-      assignment.name = incoming.name;
-    }
-    if (incoming.resourcesUrls) {
-      assignment.resourcesUrls = incoming.resourcesUrls;
-    }
-    if (incoming.topics) {
-      assignment.topics = incoming.topics;
-    }
-    assignment.version = 1;
-
-    const createdAssignment = await assignmentRepository.create(assignment);
-    const savedAssignment = await manager.save(createdAssignment);
-    const mintedAssignment = await assignmentRepository.findOne(
-      savedAssignment,
-    );
+    const mintedAssignment = await validateNewInstructor(incoming);
 
     console.log('At the instructors assignments POST route', req.user._id);
     res.send({
@@ -182,38 +156,9 @@ router.post('/cohorts/:id', requireAuth, async (req, res) => {
   try {
     console.log('At the instructors cohorts POST route', req.user._id);
 
-    const instructor = await usersRepository.findOne(req.user._id);
-    const cohort = await cohortRepository.findOne(req.params.id);
-    const assignment = await assignmentRepository.findOne(
-      req.body.assignmentId,
+    const { instructor, cohort, assignment } = await assignmentToDeliverable(
+      req,
     );
-
-    cohort.students.forEach(async studentId => {
-      // For each id in cohort, pull a student
-      // Create a new Deliverable, copying assignment into new deliverable
-      const deliverable = new Deliverable();
-      deliverable.name = assignment.name;
-      deliverable.student.push(studentId);
-      deliverable.cohort.push(cohort._id);
-      deliverable.instructions = assignment.instructions;
-      deliverable.instructor.push(instructor._id);
-      deliverable.resourcesUrls = assignment.resourcesUrls;
-      deliverable.topics = assignment.topics;
-      deliverable.deadline = new Date(req.body.dueDate);
-
-      const freshDeliverable = await manager.save(deliverable);
-      const savedDeliverable = await deliverableRepository.findOne(
-        freshDeliverable,
-      );
-
-      // Save deliverable to student
-      const student = await usersRepository.findOne(studentId);
-
-      student.deliverables.push(savedDeliverable._id);
-      // console.log(student);
-      const savedStudent = await manager.save(student);
-      console.log(savedStudent);
-    });
 
     res.send({
       message: 'At the instructors cohort POST route',
