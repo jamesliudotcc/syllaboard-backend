@@ -29,10 +29,6 @@ import { validateNewInstructor } from './validateNewInstructor';
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
 
-/*************************************** */
-//             Controllers
-/*************************************** */
-
 // Assignments: Instructor can CRUD assignments to turn into deliverables
 
 router.get('/', requireAuth, (req, res) => {
@@ -81,8 +77,6 @@ router.put('/assignments/:id', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not a instructor' });
   }
   try {
-    console.log('At the instructors assignments PUT route', req.user._id);
-
     const toEditAssignment = await assignmentRepository.findOne(req.params.id);
 
     const editedAssignment = editAssignment(toEditAssignment, req.body);
