@@ -1,5 +1,5 @@
-import { Assignment } from '../entity/Assignment';
-import { assignmentRepository, manager } from './instructor';
+import { Assignment } from '../../entity/Assignment';
+import { assignmentRepository, manager } from '../instructor';
 export async function validateNewInstructor(incoming: any) {
   const assignment = new Assignment();
   if (incoming.cohortType) {

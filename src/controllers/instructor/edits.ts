@@ -1,5 +1,5 @@
-import { Assignment } from '../entity/Assignment';
-import { Deliverable } from '../entity/Deliverable';
+import { Assignment } from '../../entity/Assignment';
+import { Deliverable } from '../../entity/Deliverable';
 
 export function editAssignment(
   toEditAssignmeent: Assignment,

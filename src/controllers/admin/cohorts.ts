@@ -1,12 +1,7 @@
-import { config as configureDotenv } from 'dotenv';
-import * as express from 'express';
-
-configureDotenv();
-
 // TypeORM setup
 import { getMongoManager, getMongoRepository } from 'typeorm';
-import { Cohort } from '../entity/Cohort';
-import { User } from '../entity/User';
+import { Cohort } from '../../entity/Cohort';
+import { User } from '../../entity/User';
 
 const usersRepository = getMongoRepository(User);
 const cohortRepository = getMongoRepository(Cohort);
@@ -14,124 +9,21 @@ const cohortRepository = getMongoRepository(Cohort);
 const manager = getMongoManager();
 
 // Express setup
+import * as express from 'express';
 const router = express.Router();
 
 // Load passport config
 // tslint:disable-next-line:no-var-requires
-const passportService = require('../services/passport');
+const passportService = require('../../services/passport');
 import passport = require('passport');
-import { editCohort, editUser } from './admin/adminEdits';
-import { sendEmail } from './admin/sendEmail';
+
+import { editCohort } from './adminEdits';
+import { sendEmail } from './sendEmail';
 
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
 
-/*************************************** */
-//             Controllers
-/*************************************** */
-
-router.get('/', requireAuth, (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).send({ error: 'Not an admin' });
-  }
-  return res.send({ user: req.user });
-});
-
-router.get('/users', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).send({ error: 'Not an admin' });
-  }
-  try {
-    console.log('User attempting to see list of users is a:', req.user.role);
-    const users = await usersRepository.find({});
-    return res.send({ users });
-  } catch (error) {
-    console.log('Something went wrong', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.get('/users/:id', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).send({ error: 'Not an admin' });
-  }
-  try {
-    const user = await usersRepository.findOneOrFail(req.params.id);
-    return res.send({ user });
-  } catch (error) {
-    console.log('Something went wrong', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.post('/users', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).send({ error: 'Not an admin' });
-  }
-  console.log('In the POST /users');
-  console.log(req.body);
-
-  try {
-    console.log(req.body);
-    const newUser = new User();
-    newUser.firstName = req.body.firstName;
-    newUser.lastName = req.body.lastName;
-    newUser.email = req.body.email;
-    newUser.password = req.body.password;
-    newUser.role = 'student';
-
-    const createdUser = await usersRepository.create(newUser);
-    const savedUser = await manager.save(createdUser);
-    const mintedUser = await usersRepository.findOne(savedUser);
-    res.send({ user: mintedUser });
-  } catch (error) {
-    console.log('Error with /admin/users POST route:', error);
-    return res.status(503).send({ user: null });
-  }
-});
-
-router.put('/users/:id', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).send({ error: 'Not an admin' });
-  }
-  try {
-    console.log('In the PUT /admin/user');
-
-    const toEditUser = await usersRepository.findOne(req.params.id);
-
-    const editedUser = editUser(toEditUser, req.body);
-
-    await usersRepository.updateOne(toEditUser, {
-      $set: editedUser,
-    });
-
-    res.send({
-      edited: editedUser,
-    });
-  } catch (error) {
-    console.log('Error with admin/user/ PUT route:', error);
-    return res.status(503).send({ user: null });
-  }
-});
-
-router.delete('/users/:id', requireAuth, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).send({ error: 'Not an admin' });
-  }
-  try {
-    console.log(`DELETE user ${req.params.id}`);
-
-    const user = await usersRepository.findOne(req.params.id);
-    const deletedUser = await usersRepository.findOneAndDelete(user);
-
-    return res.send({ deleted: deletedUser });
-  } catch (error) {
-    console.log('Something went wrong', error);
-    return res.send({ error: 'error' });
-  }
-});
-
-router.get('/cohorts', requireAuth, async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
   }
@@ -145,12 +37,10 @@ router.get('/cohorts', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/cohorts', requireAuth, async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
   }
-  console.log('In the POST /admin/cohort');
-
   try {
     console.log(req.body);
     const newCohort = new Cohort();
@@ -171,7 +61,7 @@ router.post('/cohorts', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/cohorts/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
   }
@@ -199,7 +89,7 @@ router.get('/cohorts/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/cohorts/:id', requireAuth, async (req, res) => {
+router.post('/:id', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
   }
@@ -221,12 +111,11 @@ router.post('/cohorts/:id', requireAuth, async (req, res) => {
     return res.status(503).send({ user: null });
   }
 });
-router.put('/cohorts/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
   }
   try {
-    console.log('In the PUT /admin/cohort');
     // TODO: refactor, change name of toEditCohort to cohort
     const toEditCohort = await cohortRepository.findOne(req.params.id);
 
@@ -246,7 +135,7 @@ router.put('/cohorts/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.delete('/cohorts/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).send({ error: 'Not an admin' });
   }
@@ -263,7 +152,7 @@ router.delete('/cohorts/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/cohorts/instructors/:id', requireAuth, async (req, res) => {
+router.put('/instructors/:id', requireAuth, async (req, res) => {
   // Body should be an array of userIds as JSON (application/json)
   // :id refers to the ID of the cohort to be edited.
 
@@ -272,8 +161,6 @@ router.put('/cohorts/instructors/:id', requireAuth, async (req, res) => {
   }
 
   try {
-    console.log('In add instrutor to cohort route');
-
     const toEditCohort = await cohortRepository.findOne(req.params.id);
 
     // TODO: Learn promsie all and refactor. Not today.

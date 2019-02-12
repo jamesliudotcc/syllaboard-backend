@@ -49,9 +49,21 @@ createConnection({
     //*             Routes
     ******************************************/
 
-    app.use('/admin', require('./controllers/admin'));
     app.use('/auth', require('./controllers/auth'));
+
+    app.use('/admin', require('./controllers/admin'));
+    app.use('/admin/cohorts', require('./controllers/admin/cohorts'));
+    app.use('/admin/users', require('./controllers/admin/users'));
     app.use('/instructor', require('./controllers/instructor'));
+    app.use(
+      '/instructor/assignments',
+      require('./controllers/instructor/assignments'),
+    );
+    app.use('/instructor/cohorts', require('./controllers/instructor/cohorts'));
+    app.use(
+      '/instructor/deliverables',
+      require('./controllers/instructor/deliverables'),
+    );
     app.use('/student', require('./controllers/student'));
 
     // Catchall Route

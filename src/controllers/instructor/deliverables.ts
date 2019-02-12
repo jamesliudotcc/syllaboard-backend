@@ -2,10 +2,10 @@ import * as express from 'express';
 
 // TypeORM setup
 import { getMongoManager, getMongoRepository } from 'typeorm';
-import { Assignment } from '../entity/Assignment';
-import { Cohort } from '../entity/Cohort';
-import { Deliverable } from '../entity/Deliverable';
-import { User } from '../entity/User';
+import { Assignment } from '../../entity/Assignment';
+import { Cohort } from '../../entity/Cohort';
+import { Deliverable } from '../../entity/Deliverable';
+import { User } from '../../entity/User';
 
 export const assignmentRepository = getMongoRepository(Assignment);
 export const cohortRepository = getMongoRepository(Cohort);
@@ -19,12 +19,12 @@ const router = express.Router();
 
 // Load passport config
 // tslint:disable-next-line:no-var-requires
-const passportService = require('../services/passport');
+const passportService = require('../../services/passport');
 import passport = require('passport');
 
-import { assignmentToDeliverable } from './instructor/assignmentToDeliverable';
-import { editAssignment, editDeliverable } from './instructor/edits';
-import { validateNewInstructor } from './instructor/validateNewInstructor';
+import { assignmentToDeliverable } from './assignmentToDeliverable';
+import { editAssignment, editDeliverable } from './edits';
+import { validateNewInstructor } from './validateNewInstructor';
 
 // Auth strategies
 const requireAuth = passport.authenticate('jwt', { session: false });
@@ -52,7 +52,6 @@ router.post('/assignments', requireAuth, async (req, res) => {
 
     const mintedAssignment = await validateNewInstructor(incoming);
 
-    console.log('At the instructors assignments POST route', req.user._id);
     res.send({
       message: 'At the instructors assignments POST route',
       assignment: mintedAssignment,
@@ -69,9 +68,6 @@ router.get('/assignments', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not a instructor' });
   }
   try {
-    //
-    console.log('At the instructors assignments GET route', req.user._id);
-
     const assignments = await assignmentRepository.find();
     res.send({ assignments });
   } catch (error) {
@@ -154,8 +150,6 @@ router.post('/cohorts/:id', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not a instructor' });
   }
   try {
-    console.log('At the instructors cohorts POST route', req.user._id);
-
     const { instructor, cohort, assignment } = await assignmentToDeliverable(
       req,
     );
@@ -227,8 +221,6 @@ router.delete('/cohorts/:id', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not an instructor' });
   }
   try {
-    //
-    console.log('At the instructors cohorts DELETE route', req.user._id);
     res.send('At the instructors cohort DELETE route');
   } catch (error) {
     console.log('Error with the instructor/cohorts/ DELETE route', error);
@@ -279,9 +271,6 @@ router.put('/deliverables/:id', requireAuth, async (req, res) => {
     return res.status(403).send({ error: 'Not an instructor' });
   }
   try {
-    //
-    console.log('At the instructors deliverables/:id PUT route', req.user._id);
-
     const deliverable = await deliverableRepository.findOne(req.params.id);
 
     const editedDeliverable = editDeliverable(deliverable, req.body);

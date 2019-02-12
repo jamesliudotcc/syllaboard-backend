@@ -1,5 +1,5 @@
-import { Cohort } from '../entity/Cohort';
-import { User } from '../entity/User';
+import { Cohort } from '../../entity/Cohort';
+import { User } from '../../entity/User';
 
 export function editCohort(
   toEditCohort: Cohort,

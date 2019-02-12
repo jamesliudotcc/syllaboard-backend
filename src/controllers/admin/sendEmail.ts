@@ -1,5 +1,8 @@
 import * as Mailgun from 'mailgun-js';
 
+import { config as configureDotenv } from 'dotenv';
+configureDotenv();
+
 export async function sendEmail(emailInfo: {
   email: string;
   cohortKey: string;
