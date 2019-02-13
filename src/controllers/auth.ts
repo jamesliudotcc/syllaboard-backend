@@ -89,8 +89,8 @@ router.post('/signup', async (req, res) => {
       instructorCohort.instructors.push(newInstructor._id);
       await cohortRepository.save(instructorCohort);
 
-      const instructorToken = createToken(savedInstructor);
-      const instructorRole = savedInstructor.role;
+      const instructorToken = createToken(newInstructor);
+      const instructorRole = newInstructor.role;
       return res.send({ token: instructorToken, role: instructorRole });
     }
 

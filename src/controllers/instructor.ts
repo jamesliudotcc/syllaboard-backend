@@ -53,7 +53,7 @@ router.post('/assignments', requireAuth, async (req, res) => {
     const mintedAssignment = await validateNewInstructor(incoming);
 
     console.log('At the instructors assignments POST route', req.user._id);
-    res.send({
+    return res.send({
       message: 'At the instructors assignments POST route',
       assignment: mintedAssignment,
       incoming,
@@ -73,7 +73,7 @@ router.get('/assignments', requireAuth, async (req, res) => {
     console.log('At the instructors assignments GET route', req.user._id);
 
     const assignments = await assignmentRepository.find();
-    res.send({ assignments });
+    return res.send({ assignments });
   } catch (error) {
     console.log('Error with the instructor/assignments/ GET route', error);
     return res.send({ error: 'error' });
@@ -160,7 +160,7 @@ router.post('/cohorts/:id', requireAuth, async (req, res) => {
       req,
     );
 
-    res.send({
+    return res.send({
       message: 'At the instructors cohort POST route',
       instructor,
       cohort,
@@ -212,7 +212,7 @@ router.put('/cohorts/:id', requireAuth, async (req, res) => {
   try {
     //
     console.log('At the instructors cohorts PUT route', req.user._id);
-    res.send('At the instructors cohort PUT route');
+    return res.send('At the instructors cohort PUT route');
   } catch (error) {
     console.log('Error with the instructor/cohorts/ PUT route', error);
     return res.send({ error: 'error' });
@@ -229,7 +229,7 @@ router.delete('/cohorts/:id', requireAuth, async (req, res) => {
   try {
     //
     console.log('At the instructors cohorts DELETE route', req.user._id);
-    res.send('At the instructors cohort DELETE route');
+    return res.send('At the instructors cohort DELETE route');
   } catch (error) {
     console.log('Error with the instructor/cohorts/ DELETE route', error);
     return res.send({ error: 'error' });
@@ -246,7 +246,7 @@ router.get('/deliverables', requireAuth, async (req, res) => {
       where: { instructor: req.user._id },
     });
 
-    res.send({
+    return res.send({
       message: 'At the instructors deliverables GET route',
       deliverables,
     });
@@ -263,7 +263,7 @@ router.get('/deliverables/:id', requireAuth, async (req, res) => {
   try {
     const deliverable = await deliverableRepository.findOne(req.params.id);
     const student = await usersRepository.findOne(deliverable.student[0]);
-    res.send({
+    return res.send({
       message: 'At the instructors deliverables GET route',
       deliverable,
       student,
@@ -292,12 +292,11 @@ router.put('/deliverables/:id', requireAuth, async (req, res) => {
       { $set: editedDeliverable },
     );
 
-    res.send({
+    return res.send({
       message: 'At the users deliverables/:id PUT route',
       editedDeliverable,
       updatedDeliverable,
     });
-    res.send('At the instructors deliverables/:id PUT route');
   } catch (error) {
     console.log('Error with instructor/deliverable/ PUT route:', error);
     return res.status(503).send({ user: null });
